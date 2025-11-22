@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Marcelo do Firu Firu - HS PESCOÇO</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+
+    <div class="container">
+        <header class="header">
+            <h1>LOJA DE MARCELO DO FIRU FIRU</h1>
+        </header>
+
+        <main class="product-info">
+            <h2>HS PESCOÇO + HOLOGRAMA</h2>
+            <p id="product-price" class="price">$30.00</p>
+
+            <section class="coupon-section card"> 
+                <label for="coupon-input">Digite seu cupom:</label>
+                <div class="coupon-input-group">
+                    <input type="text" id="coupon-input" placeholder="ADICIONE O CUPOM DE 30%">
+                    <button id="apply-coupon-btn">Aplicar</button>
+                </div>
+                <p id="coupon-message" class="coupon-message"></p>
+            </section>
+
+            <section class="image-placeholder card"> 
+                <iframe 
+                    class="youtube-player"
+                    src="https://www.youtube.com/embed/w44zIA73moQ" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </section>
+            
+            <button id="start-purchase-btn" class="buy-vip-open-btn">COMPRAR PRODUTO VIP</button>
+
+            <section id="exclusive-advantages-section">
+                <h3 class="advantages-title">✨ VANTAGENS EXCLUSIVAS ✨</h3>
+                <div class="advantages-grid">
+                    
+                    <div class="advantage-card card">
+                        <span class="icon">⚡</span>
+                        <h4>Entrega Imediata</h4>
+                        <p>Liberação automática via Instagram após a confirmação do pagamento PIX.</p>
+                    </div>
+
+                    <div class="advantage-card card">
+                        <span class="icon">🛡️</span>
+                        <h4>Garantia Total</h4>
+                        <p>7 dias de garantia incondicional em todos os produtos, sem pegadinhas.</p>
+                    </div>
+
+                    <div class="advantage-card card">
+                        <span class="icon">💬</span>
+                        <h4>Suporte 24h</h4>
+                        <p>Atendimento e suporte especializado via Instagram/WhatsApp a qualquer hora.</p>
+                    </div>
+
+                    </div>
+            </section>
+            
+            <section id="data-form-step" class="purchase-step card"> 
+                <h3>1. Dados para Compra VIP</h3>
+                <p id="data-validation-message" class="validation-message"></p>
+                
+                <div class="form-group">
+                    <label for="email-input">Seu Email:</label>
+                    <input type="email" id="email-input" placeholder="seu.email@exemplo.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dob-input">Data de Nascimento:</label>
+                    <input type="date" id="dob-input">
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="confirmation-checkbox">
+                    <label for="confirmation-checkbox">CONFIRMO QUE SOU MAIOR DE 18 ANOS</label>
+                </div>
+
+                <button id="go-to-duration-btn" class="buy-vip-submit-btn">PROSSEGUIR COM A COMPRA</button>
+            </section>
+
+            <section id="duration-payment-step" class="purchase-step card"> 
+                <h3>2. Selecione a Duração e Pague</h3>
+
+                <div class="duration-options">
+                    </div>
+                
+                <p id="payment-selection-message" class="validation-message"></p>
+
+                <div id="payment-details" style="display: none; text-align: center; margin-top: 20px;">
+                    
+                    <h4 style="color: var(--cinza-claro); margin-bottom: 5px;">VALOR A PAGAR</h4>
+                    <p id="final-price" class="price" style="font-size: 2em; margin-bottom: 20px; color: var(--azul-principal);">$0.00</p> 
+                    
+                    <button id="copy-pix-btn" class="buy-vip-submit-btn" style="background-color: var(--verde-sucesso); width: auto; padding: 15px 30px;">
+                        COPIAR CHAVE PIX
+                    </button>
+                    <p id="copy-feedback" style="margin-top: 10px; font-weight: bold;"></p>
+
+                    <div id="bank-info" class="payment-info" style="display: none;">
+                        <h4>Dados do Recebedor:</h4>
+                        <div class="bank-details">
+                            <p>Banco: (Picpay)</p>
+                            <p>Nome: (João Pedro de lima)</p>
+                            <p>Chave PIX: (81997777361)</p>
+                        </div>
+                        <p class="alert-warning">SÓ PAGUE SE REALMENTE APARECER ESSES DADOS DE NOME E BANCO ACIMA.</p>
+                    </div>
+                    
+                    <p id="instagram-instructions" style="margin-top: 20px; font-size: 0.9em; color: var(--cinza-claro); display: none;">
+                        APÓS O PIX, SALVE O COMPROVANTE E CLIQUE EM ABRIR INSTAGRAM. MANDE O COMPROVANTE E VOCÊ RECEBERÁ OS LINKS DE DOWNLOAD E TUTORIAL.
+                    </p>
+
+                    <button id="open-instagram-btn" class="buy-vip-submit-btn instagram-btn" style="display: none;">
+                        ABRIR INSTAGRAM
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script> 
+</body>
+</html>
