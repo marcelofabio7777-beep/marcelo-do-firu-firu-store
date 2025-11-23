@@ -63,24 +63,46 @@ body {
     text-shadow: 0 0 12px rgba(0, 240, 255, 1.0); 
 }
 
+/* NOVO ESTILO: Card do Produto Único */
+.product-selection-card {
+    border: 2px solid #a020f0; /* Roxo */
+    box-shadow: 0 0 25px rgba(160, 32, 240, 0.8), 0 0 10px rgba(0, 0, 0, 0.5); 
+    padding: 15px;
+    margin-bottom: 30px;
+}
+
+.product-image-placeholder {
+    height: 150px;
+    background-color: #333;
+    border: 1px dashed #a020f0;
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    font-size: 0.9em;
+    color: #a020f0;
+}
+
 .product-info h2 {
     font-size: 1.5em;
     text-align: center;
     margin-bottom: 5px;
-    color: var(--azul-claro); 
+    color: #a020f0; /* Roxo no nome do produto */
+    text-shadow: 0 0 10px rgba(160, 32, 240, 0.8);
 }
 
-.price {
-    font-size: 2.5em;
+.price-indicator {
+    font-size: 1.5em;
     font-weight: bold;
     color: var(--azul-principal); 
     text-align: center;
     margin-top: 0;
-    margin-bottom: 30px;
-    text-shadow: 0 0 15px rgba(0, 240, 255, 1.0); 
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.8); 
 }
 
-/* ESTILO PARA CARDS GERAIS (Cupon, Passo 1, Passo 2) */
+/* ESTILO PARA CARDS GERAIS */
 .card {
     padding: 20px;
     background-color: var(--fundo-secao); 
@@ -97,69 +119,53 @@ body {
     box-shadow: 0 0 35px rgba(0, 240, 255, 0.7), 0 0 10px rgba(0, 0, 0, 0.7);
 }
 
-/* NOVO ESTILO PARA A SEÇÃO DE VANTAGENS */
-#exclusive-advantages-section {
-    margin-top: 30px;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-.advantages-title {
-    color: var(--amarelo-neon); 
-    font-size: 1.6em;
-    margin-bottom: 20px;
-    text-shadow: 0 0 18px rgba(255, 238, 0, 1.0); /* Sombra neon amarela MAIS INTENSA */
-}
-
-.advantages-grid {
-    display: grid;
-    grid-template-columns: 1fr; 
-    gap: 15px;
-}
-
-/* Cards individuais de Vantagens */
-.advantage-card {
-    padding: 25px 20px;
-    text-align: center;
-}
-
-.advantage-card .icon {
-    display: block;
-    font-size: 2.5em; 
-    margin-bottom: 10px;
-    color: var(--azul-principal); 
-    text-shadow: 0 0 10px rgba(0, 240, 255, 1.0); 
-}
-
-.advantage-card h4 {
-    color: var(--branco-texto);
-    margin: 0 0 8px 0;
-    font-size: 1.2em;
-}
-
-.advantage-card p {
+/* NOVO: Estilo para o Timer Fixo no Topo */
+#countdown-timer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(28, 28, 28, 0.8); /* Fundo sutil */
     color: var(--cinza-claro);
-    font-size: 0.9em;
-    /* Ajuste para evitar o "vazamento" do texto */
-    word-wrap: break-word; /* Quebra palavras longas */
-    hyphens: auto; /* Adiciona hífens se necessário */
+    padding: 8px 0;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Media Query para telas maiores (3 colunas) */
-@media (min-width: 480px) {
-    .advantages-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
-    }
+.timer-text {
+    color: var(--cinza-claro); /* COMPRE ANTES QUE O TEMPO ACABE */
+    margin-right: 10px;
+    text-transform: uppercase;
 }
 
+.timer-value {
+    color: var(--vermelho-erro); /* Cor do relógio */
+    text-shadow: none; /* Sem brilho/saturação forte */
+    font-weight: bold;
+    font-size: 1.1em;
+}
 
-/* --- ESTILOS DE COMPRA E FORMULÁRIO --- */
+.scrolled-timer {
+    opacity: 0.8; /* Opacidade 80% ao rolar */
+}
+
+/* --- ESTILOS DE CUPOM --- */
+.coupon-title {
+    color: var(--cinza-claro);
+    margin-bottom: 10px;
+}
 
 .coupon-section label {
     display: block;
     margin-bottom: 10px;
     font-size: 1.1em;
-    color: var(--cinza-claro);
+    color: var(--azul-principal); /* Destacando o DIGITE CUPOM */
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
 }
 
 .coupon-input-group {
@@ -182,64 +188,7 @@ body {
     box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
 }
 
-#coupon-input:focus {
-    box-shadow: 0 0 15px var(--azul-principal);
-}
-
-#apply-coupon-btn {
-    padding: 10px 15px;
-    background-color: var(--azul-principal);
-    color: var(--preto-fundo); 
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s, box-shadow 0.3s;
-}
-
-#apply-coupon-btn:hover {
-    background-color: var(--azul-claro);
-    box-shadow: 0 0 15px var(--azul-principal);
-}
-
-#coupon-message, .validation-message {
-    margin-top: 15px;
-    font-weight: bold;
-    min-height: 20px;
-    text-align: center;
-}
-
-.incorrect {
-    color: var(--vermelho-erro);
-}
-
-.success {
-    color: var(--amarelo-neon);
-    text-shadow: 0 0 10px rgba(255, 238, 0, 1.0); /* Brilho mais forte para amarelo */
-}
-
-
-/* ESTILO VÍDEO E BOTÕES GERAIS */
-.image-placeholder {
-    width: 100%;
-    padding-top: 56.25%; 
-    position: relative;
-    background-color: #000; 
-    border-radius: 12px; 
-    overflow: hidden;
-    margin-top: 20px;
-    border: none; 
-    box-shadow: 0 0 20px rgba(0, 240, 255, 0.7); 
-}
-
-.youtube-player {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-}
+/* ... (Estilos de vantagens e botões já existentes, apenas a seção de vídeo foi removida) ... */
 
 /* BOTÃO COMPRAR PRODUTO VIP - Ajustes de Texto e Animação */
 .buy-vip-open-btn {
@@ -251,178 +200,155 @@ body {
     border: none;
     border-radius: 8px; 
     font-size: 1.2em;
-    font-weight: bolder; /* Mais grosso */
+    font-weight: bolder; 
     cursor: pointer;
     margin-top: 20px;
     margin-bottom: 20px; 
-    /* Animação mais rápida (0.2s) e brilho no texto */
     transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
     text-transform: uppercase;
     letter-spacing: 1px;
     box-shadow: 0 0 15px rgba(0, 240, 255, 0.7); 
-    text-shadow: 0 0 4px rgba(0, 0, 0, 0.2); /* Brilho sutil no texto preto */
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.2); 
 }
 
-.buy-vip-open-btn:hover {
-    background-color: var(--azul-claro);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 240, 255, 1.0); 
+/* --- ESTILOS DE MODAL --- */
+
+.modal-overlay {
+    display: none; /* Inicia escondido */
+    position: fixed;
+    z-index: 2000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8); /* Fundo escuro */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    padding-top: 60px;
 }
 
-/* Oculta os passos do formulário no início */
-.purchase-step {
-    display: none; 
+.modal-content {
+    background-color: var(--fundo-secao);
+    margin: 5% auto; 
+    padding: 30px;
+    border: 2px solid var(--azul-principal);
+    width: 90%; 
+    max-width: 400px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.9);
+    position: relative;
+    animation: fadeIn 0.3s;
 }
 
-/* Estilos de Formulário */
-.purchase-step h3 {
-    color: var(--azul-principal);
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.close-btn {
+    color: var(--cinza-claro);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: var(--vermelho-erro);
+    text-decoration: none;
+}
+
+.modal-title {
+    color: var(--amarelo-neon);
     text-align: center;
     margin-top: 0;
     margin-bottom: 20px;
-    text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
+    text-shadow: 0 0 12px rgba(255, 238, 0, 0.8);
+    font-size: 1.4em;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: var(--cinza-claro);
-    font-size: 0.95em;
-    text-align: left; 
-    padding-left: 5px; 
+.attention-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    margin-bottom: 30px;
 }
 
-.form-group input:not([type="checkbox"]) {
-    width: 100%;
+.attention-list li {
+    background-color: #333;
     padding: 10px;
-    border: 1px solid #555;
-    border-radius: 4px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    border-left: 5px solid var(--verde-neon);
+    font-size: 0.95em;
+    color: var(--cinza-claro);
+}
+
+.attention-list li .checkmark {
+    color: var(--verde-neon);
+    margin-right: 5px;
+}
+
+/* NOVO ESTILO: Input de Duração */
+.duration-input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#duration-input {
+    width: 80px;
+    padding: 10px;
+    font-size: 1.2em;
+    text-align: center;
+    border: 2px solid var(--azul-principal);
+    border-radius: 5px 0 0 5px;
     background-color: #0d0d0d;
     color: var(--branco-texto);
-    box-sizing: border-box;
     outline: none;
-    box-shadow: 0 0 5px rgba(0, 240, 255, 0.2);
+    box-sizing: border-box;
 }
 
-.form-group input:not([type="checkbox"]):focus {
-    border-color: var(--azul-principal);
-    box-shadow: 0 0 15px var(--azul-principal); 
+.input-suffix {
+    padding: 10px;
+    background-color: var(--azul-principal);
+    color: var(--preto-fundo);
+    font-weight: bold;
+    border-radius: 0 5px 5px 0;
+    font-size: 1.2em;
 }
 
-.checkbox-group {
-    display: flex;
-    align-items: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    justify-content: center;
+/* Removendo a seta do input type="number" */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    margin: 0;
 }
+input[type=number] { -moz-appearance: textfield; }
 
-.checkbox-group input[type="checkbox"] {
-    margin-right: 10px;
-    accent-color: var(--azul-principal); 
-}
-
-/* BOTÃO VERDE (PROSSEGUIR COM A COMPRA, COPIAR PIX, ABRIR INSTAGRAM) - Ajustes de Cor e Texto */
+/* Mantendo estilos de botões de sucesso/formulário */
 .buy-vip-submit-btn {
     width: 100%;
     padding: 12px;
-    background-color: var(--verde-neon); /* Cor de fundo verde neon */
-    color: var(--branco-texto); /* Texto branco */
+    background-color: var(--verde-neon); 
+    color: var(--branco-texto); 
     border: none;
     border-radius: 8px; 
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
     text-transform: uppercase;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Brilho branco sutil no texto */
-    box-shadow: 0 0 10px rgba(57, 255, 20, 0.8); /* Sombra neon verde */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); 
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.8); 
 }
 
-.buy-vip-submit-btn:hover {
-    background-color: var(--verde-neon-claro); /* Verde neon mais claro no hover */
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(57, 255, 20, 1.0); /* Sombra mais intensa no hover */
-}
-
-/* ESTILOS PARA DURAÇÃO (TELA 3) */
-.duration-options {
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-    gap: 12px;
-    margin-bottom: 25px;
-}
-
-.duration-btn {
-    background-color: #333; 
-    color: var(--branco-texto);
-    padding: 15px;
-    border: 3px solid transparent; 
-    border-radius: 8px;
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.2s, border-color 0.2s, transform 0.1s, box-shadow 0.2s;
-    font-size: 1.1em;
-    font-weight: 600;
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-}
-
-.duration-btn span:first-child {
-    font-weight: normal; 
-    color: var(--cinza-claro);
-}
-
-.duration-btn span:last-child {
-    font-weight: bold; 
-    color: var(--azul-principal); 
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.8); 
-}
-
-.duration-btn:hover {
-    background-color: #444;
-    transform: scale(1.02);
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.7); 
-}
-
-.duration-btn.selected {
-    border-color: var(--azul-principal);
-    background-color: #333;
-    font-weight: bold;
-    box-shadow: 0 0 20px rgba(0, 240, 255, 1.0); 
-}
-
-/* Estilos para a seção de pagamento */
-.payment-info {
-    border-top: 1px solid #555;
-    padding-top: 20px;
-    margin-top: 20px;
-    text-align: center;
-}
-
-.bank-details {
-    margin-top: 10px;
-    margin-bottom: 15px;
-    padding: 10px;
-    background-color: #1a1a1a; 
-    border-radius: 5px;
-    border: 1px dashed var(--azul-claro); 
-}
-
-.bank-details p {
-    margin: 5px 0;
-}
-
-.alert-warning {
-    color: var(--vermelho-erro);
-    font-weight: bold;
-    margin-top: 15px;
-    border: 1px solid var(--vermelho-erro);
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
-}
-
+/* ... (Estilos de sucesso/erro e botões de redes sociais) ... */
 .instagram-btn {
     background-color: #e4405f; 
     margin-top: 15px;
@@ -434,3 +360,11 @@ body {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(228, 64, 95, 0.7);
 }
+
+@media (min-width: 480px) {
+    .advantages-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+    }
+}
+
+    
