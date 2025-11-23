@@ -1,54 +1,49 @@
 // --- Variáveis Globais e Configurações ---
-const ORIGINAL_PRICE = 30.0;
-const DISCOUNTED_PRICE = 19.0;
 const CORRECT_COUPON = 'MARCELO';
-const MINIMUM_AGE = 18; 
+const DISCOUNT_PERCENTAGE = 0.30; // 30%
+const TIMER_START_SECONDS = 7 * 60; // 7 minutos
 const PIX_KEY = '81997777361'; 
 const INSTAGRAM_USERNAME = 'marcelinho_zzs';
 const INSTAGRAM_MESSAGE = 'COMPREI O HS + HOLOGRAMA';
 
-// Cria o link de deep link (URL Encoding para a mensagem)
+// Tabela de preços dinâmicos por dia (Seu pedido)
+const DAY_PRICES = {
+    1: 5.0, 2: 6.0, 3: 8.0, 4: 10.0, 5: 13.0, 6: 15.0, 7: 18.0, 8: 20.0, 9: 22.0, 10: 24.0,
+    11: 26.0, 12: 28.0, 13: 30.0, 14: 31.0, 15: 32.0, 16: 34.0, 17: 36.0, 18: 38.0, 19: 39.0, 20: 40.0,
+    21: 42.0, 22: 44.0, 23: 46.0, 24: 48.0, 25: 50.0, 26: 51.0, 27: 52.0, 28: 53.0, 29: 55.0, 30: 60.0
+};
+
+const INITIAL_PRODUCT_PRICE = 30.00;
+let currentProductPrice = INITIAL_PRODUCT_PRICE;
+let finalPaymentPrice = 0;
+let daysSelected = 0;
+
+// Cria o link de deep link
 const INSTAGRAM_LINK_DIRECT = `https://ig.me/m/${INSTAGRAM_USERNAME}?ref=COMPRA-SITE&text=${encodeURIComponent(INSTAGRAM_MESSAGE)}`;
 
 
-const DURATION_PRICES = [
-    { days: '2 dias', price: 7.00, key: '2D' },
-    { days: '7 dias', price: 17.00, key: '7D' },
-    { days: '14 dias', price: 30.00, key: '14D' },
-    { days: '1 mês', price: 50.00, key: '1M' },
-    { days: 'Permanente', price: 250.00, key: 'PERM' }
-];
+// --- Seletores DOM ---
+const timerDisplay = document.getElementById('timer-display');
+const countdownTimer = document.getElementById('countdown-timer');
+const priceIndicator = document.querySelector('.price-indicator');
 
-let selectedDurationPrice = 0;
-
-// --- Seletores DOM (Referências aos elementos HTML) ---
-
-// Tela 1 (Home)
-const priceElement = document.getElementById('product-price');
+// Cupom
 const couponInput = document.getElementById('coupon-input');
 const couponMessage = document.getElementById('coupon-message');
 const applyCouponBtn = document.getElementById('apply-coupon-btn');
+
+// Modals e Botões
 const startPurchaseBtn = document.getElementById('start-purchase-btn');
-
-// Foi adicionado um seletor para incluir a nova seção de vantagens
-const mainInfoElements = document.querySelectorAll(
-    '.product-info h2, .product-info .price, .coupon-section, .image-placeholder, #start-purchase-btn, #exclusive-advantages-section'
-);
-
-// Tela 2 (Dados Pessoais)
-const dataFormStep = document.getElementById('data-form-step');
-const dataValidationMessage = document.getElementById('data-validation-message');
-const emailInput = document.getElementById('email-input');
-const dobInput = document.getElementById('dob-input');
-const confirmationCheckbox = document.getElementById('confirmation-checkbox');
-const goToDurationBtn = document.getElementById('go-to-duration-btn');
-
-// Tela 3 (Duração e Pagamento)
-const durationPaymentStep = document.getElementById('duration-payment-step');
-const durationOptionsContainer = document.querySelector('.duration-options');
-const paymentSelectionMessage = document.getElementById('payment-selection-message');
-const paymentDetailsDiv = document.getElementById('payment-details');
+const attentionModal = document.getElementById('attention-modal');
+const closeBtns = document.querySelectorAll('.close-btn');
+const confirmModalBtn = document.getElementById('confirm-modal-btn');
+const durationModal = document.getElementById('duration-modal');
+const durationInput = document.getElementById('duration-input');
+const durationValidationMessage = document.getElementById('duration-validation-message');
+const paymentStepContent = document.getElementById('payment-step-content');
 const finalPriceElement = document.getElementById('final-price');
+
+// Pagamento
 const copyPixBtn = document.getElementById('copy-pix-btn');
 const copyFeedback = document.getElementById('copy-feedback');
 const bankInfoDiv = document.getElementById('bank-info');
@@ -56,143 +51,152 @@ const instagramInstructions = document.getElementById('instagram-instructions');
 const openInstagramBtn = document.getElementById('open-instagram-btn');
 
 
-// --- FUNÇÕES DE CONTROLE DE TELA (FLUXO) ---
+// --- FUNÇÕES DE TIMER (Contagem regressiva) ---
 
-// Função genérica para esconder ou mostrar as telas
-function setScreenVisibility(homeVisible, dataVisible, durationVisible) {
-    // Esconde/mostra a seção de Vantagens e os elementos da home
-    mainInfoElements.forEach(el => el.style.display = homeVisible ? '' : 'none');
-    
-    // Esconde/mostra os passos de compra
-    dataFormStep.style.display = dataVisible ? 'block' : 'none';
-    durationPaymentStep.style.display = durationVisible ? 'block' : 'none';
-    
-    document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+function formatTime(seconds) {
+    const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const sec = String(seconds % 60).padStart(2, '0');
+    return `${min}:${sec}`;
 }
 
-// Handler: Inicia o fluxo (vai da Tela 1 para a Tela 2)
-startPurchaseBtn.addEventListener('click', () => {
-    setScreenVisibility(false, true, false); 
-});
+let timerInterval;
 
-// --- FUNÇÕES DE LÓGICA TELA 1 (Cupom) ---
+function startTimer() {
+    let timeLeft = TIMER_START_SECONDS;
+    timerDisplay.textContent = formatTime(timeLeft);
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = formatTime(timeLeft);
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerDisplay.textContent = 'TEMPO ESGOTADO!';
+            // Lógica opcional para desativar a compra aqui.
+        }
+    }, 1000);
+}
+
+// --- FUNÇÕES DE LÓGICA TELA 1 (Cupom e Preço) ---
+
+function updatePriceDisplay() {
+    priceIndicator.textContent = `Preço: R$${currentProductPrice.toFixed(2).replace('.', ',')}`;
+}
 
 applyCouponBtn.addEventListener('click', function() {
     const input = couponInput.value.trim();
     const messageElement = couponMessage;
     
-    // NOTA: O cupom ainda é 'MARCELO', mas o placeholder foi atualizado no HTML
     if (input.toUpperCase() === CORRECT_COUPON) { 
-        priceElement.textContent = `$${DISCOUNTED_PRICE.toFixed(2)}`;
-        messageElement.textContent = '🎉 Cupom aceito! Preço atualizado! 🎉';
+        currentProductPrice = INITIAL_PRODUCT_PRICE * (1 - DISCOUNT_PERCENTAGE);
+        messageElement.textContent = `🎉 Cupom aceito! 30% de desconto aplicado. Preço: R$${currentProductPrice.toFixed(2).replace('.', ',')} 🎉`;
         messageElement.className = 'coupon-message success';
     } else {
-        priceElement.textContent = `$${ORIGINAL_PRICE.toFixed(2)}`;
-        messageElement.textContent = 'O cupom está incorreto. Preço original mantido.';
+        currentProductPrice = INITIAL_PRODUCT_PRICE;
+        messageElement.textContent = 'O cupom está incorreto ou vazio. Preço original mantido.';
         messageElement.className = 'coupon-message incorrect';
     }
+    updatePriceDisplay();
 });
 
 
-// --- FUNÇÕES DE LÓGICA TELA 2 (Dados Pessoais) ---
+// --- FUNÇÕES DE CONTROLE DE MODAL ---
 
-function calculateAge(birthday) {
-    const birthDate = new Date(birthday);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
-    return age;
+function openModal(modal) {
+    modal.style.display = 'block';
 }
 
-// Handler: Valida a Tela 2 e avança para a Tela 3
-goToDurationBtn.addEventListener('click', function() {
-    const email = emailInput.value.trim();
-    const dob = dobInput.value; 
-    const isConfirmed = confirmationCheckbox.checked;
+function closeModal(modal) {
+    modal.style.display = 'none';
+}
 
-    function showValidationError(message) {
-        dataValidationMessage.textContent = message;
-        dataValidationMessage.className = 'validation-message incorrect';
-    }
-    
-    if (!email || !email.includes('@') || !email.includes('.')) {
-        showValidationError('Por favor, insira um e-mail válido.');
-        return;
-    }
-
-    if (!dob) {
-        showValidationError('Por favor, insira sua data de nascimento.');
-        return;
-    }
-    
-    const age = calculateAge(dob);
-    
-    if (age < MINIMUM_AGE) {
-        showValidationError(`Você deve ser maior de ${MINIMUM_AGE} anos para prosseguir.`);
-        return;
-    }
-
-    if (!isConfirmed) {
-        showValidationError('Você deve confirmar que é maior de 18 anos.');
-        return;
-    }
-
-    dataValidationMessage.textContent = '✅ Dados válidos! Escolha a duração.';
-    dataValidationMessage.className = 'validation-message success';
-    setScreenVisibility(false, false, true); 
+// Handler: Abre o Modal de Atenção
+startPurchaseBtn.addEventListener('click', () => {
+    openModal(attentionModal);
 });
 
+// Handler: Fecha os Modals (Botão X)
+closeBtns.forEach(btn => btn.addEventListener('click', () => {
+    closeModal(attentionModal);
+    closeModal(durationModal);
+}));
 
-// --- FUNÇÕES DE LÓGICA TELA 3 (Duração e Pagamento) ---
+// Handler: Passa do Modal de Atenção para o Modal de Duração
+confirmModalBtn.addEventListener('click', () => {
+    closeModal(attentionModal);
+    openModal(durationModal);
+    // Limpa a entrada e mensagem de erro ao abrir
+    durationInput.value = '';
+    durationValidationMessage.textContent = '';
+    paymentStepContent.style.display = 'none';
+});
 
-function renderDurationOptions() {
-    // Usamos dois spans na estrutura para que o CSS possa separar a duração e o preço
-    durationOptionsContainer.innerHTML = DURATION_PRICES.map(item => `
-        <button class="duration-btn" data-price="${item.price.toFixed(2)}" data-key="${item.key}">
-            <span>${item.days}</span>
-            <span>R$${item.price.toFixed(2).replace('.', ',')}</span>
-        </button>
-    `).join('');
-}
+// --- FUNÇÕES DE LÓGICA MODAL DURAÇÃO ---
 
-function handleDurationSelection(event) {
-    const button = event.target.closest('.duration-btn');
-    if (!button) return;
+durationInput.addEventListener('input', function() {
+    // 1. Limitar a entrada a 2 dígitos (ou 1 se for o caso)
+    let value = this.value.replace(/\D/g, ''); // Remove não-dígitos
+    if (value.length > 2) {
+        value = value.slice(0, 2);
+    }
+    this.value = value;
 
-    document.querySelectorAll('.duration-btn').forEach(btn => btn.classList.remove('selected'));
-    button.classList.add('selected');
+    daysSelected = parseInt(value);
 
-    selectedDurationPrice = parseFloat(button.getAttribute('data-price'));
+    // Esconde os detalhes do pagamento por padrão
+    paymentStepContent.style.display = 'none';
+    durationValidationMessage.textContent = '';
+    durationValidationMessage.className = 'validation-message';
+
+    if (isNaN(daysSelected) || daysSelected < 1) {
+        // Nada selecionado ou inválido, apenas retorna
+        return;
+    }
+
+    if (daysSelected > 30) {
+        durationValidationMessage.textContent = 'VOCÊ SÓ PODE ESCOLHER DE 1 A 30 DIAS';
+        durationValidationMessage.className = 'validation-message incorrect';
+        return;
+    }
     
-    const priceFormatted = selectedDurationPrice.toFixed(2).replace('.', ',');
-    finalPriceElement.textContent = `R$${priceFormatted}`;
+    // 2. Cálculo do Preço
+    finalPaymentPrice = DAY_PRICES[daysSelected];
     
-    const durationText = button.querySelector('span:first-child').textContent;
-    paymentSelectionMessage.textContent = `Você selecionou ${durationText}.`;
-    paymentSelectionMessage.className = 'validation-message success';
-    paymentDetailsDiv.style.display = 'block';
-    
-    // Reseta/Esconde os detalhes de pagamento/Instagram até a cópia
-    bankInfoDiv.style.display = 'none';
-    openInstagramBtn.style.display = 'none';
-    instagramInstructions.style.display = 'none';
-    copyFeedback.textContent = ''; 
-}
+    if (finalPaymentPrice) {
+        const priceFormatted = finalPaymentPrice.toFixed(2).replace('.', ',');
+        finalPriceElement.textContent = `R$${priceFormatted}`;
+        durationValidationMessage.textContent = `✅ ${daysSelected} dias selecionados. Preço: R$${priceFormatted}`;
+        durationValidationMessage.className = 'validation-message success';
+        
+        // Exibe a seção de pagamento
+        paymentStepContent.style.display = 'block';
+        
+        // Reseta informações de pagamento
+        copyFeedback.textContent = '';
+        bankInfoDiv.style.display = 'none';
+        openInstagramBtn.style.display = 'none';
+        instagramInstructions.style.display = 'none';
+    }
+});
+
+// Forçar o teclado numérico em dispositivos móveis (já feito com inputmode="numeric" no HTML, mas reforçando)
+durationInput.addEventListener('focus', function() {
+    this.setAttribute('inputmode', 'numeric');
+});
+
+// --- FUNÇÕES DE LÓGICA PAGAMENTO ---
 
 // Handler: Copia a chave PIX
-copyPixBtn.addEventListener('click', function() { // CORRIGIDO: O token extra foi removido daqui
-    if (selectedDurationPrice === 0) {
-        copyFeedback.textContent = 'Selecione uma duração antes de copiar.';
+copyPixBtn.addEventListener('click', function() {
+    if (finalPaymentPrice === 0) {
+        copyFeedback.textContent = 'Selecione a duração antes de copiar.';
         copyFeedback.className = 'incorrect';
         return;
     }
 
-    const priceFormatted = selectedDurationPrice.toFixed(2).replace('.', ',');
+    const priceFormatted = finalPaymentPrice.toFixed(2).replace('.', ',');
     
-    // Copia APENAS os números da chave Pix
+    // Copia a chave Pix
     navigator.clipboard.writeText(PIX_KEY)
         .then(() => {
             // Sucesso na cópia
@@ -203,7 +207,6 @@ copyPixBtn.addEventListener('click', function() { // CORRIGIDO: O token extra fo
             bankInfoDiv.style.display = 'block';
             openInstagramBtn.style.display = 'block';
             instagramInstructions.style.display = 'block';
-
         })
         .catch(err => {
             // Falha na cópia (fallback)
@@ -219,11 +222,19 @@ openInstagramBtn.addEventListener('click', function() {
     window.open(INSTAGRAM_LINK_DIRECT, '_blank');
 });
 
+// --- FUNÇÕES DE SCROLL (Para o Timer Fixo) ---
 
-// Adiciona o event listener ao container para lidar com cliques nos botões de duração
-durationOptionsContainer.addEventListener('click', handleDurationSelection);
+function handleScroll() {
+    if (window.scrollY > 50) { // Se rolar mais de 50px
+        countdownTimer.classList.add('scrolled-timer');
+    } else {
+        countdownTimer.classList.remove('scrolled-timer');
+    }
+}
 
 
 // --- Inicialização ---
-renderDurationOptions();
-setScreenVisibility(true, false, false);
+
+window.addEventListener('scroll', handleScroll);
+startTimer(); 
+updatePriceDisplay(); 
