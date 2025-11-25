@@ -12,6 +12,10 @@
     /* NOVO: Verde Neon brilhante */
     --verde-neon: #39ff14; /* Verde neon bem brilhante */
     --verde-neon-claro: #66ff33; /* Uma versão mais clara para o hover */
+    /* NOVO: Variáveis para o Card VIP Roxo */
+    --roxo-vip: #a020f0; /* Roxo padrão (Violet) */
+    --roxo-claro: #c678f5; /* Roxo para destaque */
+    --roxo-sombra: rgba(160, 32, 240, 0.8);
 }
 
 body {
@@ -63,45 +67,6 @@ body {
     text-shadow: 0 0 12px rgba(0, 240, 255, 1.0); 
 }
 
-/* NOVO ESTILO: Card do Produto Único */
-.product-selection-card {
-    border: 2px solid #a020f0; /* Roxo */
-    box-shadow: 0 0 25px rgba(160, 32, 240, 0.8), 0 0 10px rgba(0, 0, 0, 0.5); 
-    padding: 15px;
-    margin-bottom: 30px;
-}
-
-.product-image-placeholder {
-    height: 150px;
-    background-color: #333;
-    border: 1px dashed #a020f0;
-    margin: 10px 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 8px;
-    font-size: 0.9em;
-    color: #a020f0;
-}
-
-.product-info h2 {
-    font-size: 1.5em;
-    text-align: center;
-    margin-bottom: 5px;
-    color: #a020f0; /* Roxo no nome do produto */
-    text-shadow: 0 0 10px rgba(160, 32, 240, 0.8);
-}
-
-.price-indicator {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: var(--azul-principal); 
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 20px;
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.8); 
-}
-
 /* ESTILO PARA CARDS GERAIS */
 .card {
     padding: 20px;
@@ -118,6 +83,145 @@ body {
     transform: translateY(-3px);
     box-shadow: 0 0 35px rgba(0, 240, 255, 0.7), 0 0 10px rgba(0, 0, 0, 0.7);
 }
+
+/* ---------------------------------------------------- */
+/* Container para alinhamento LADO A LADO */
+/* ---------------------------------------------------- */
+
+.product-and-panel-wrapper {
+    /* Padrão Mobile (Telas Pequenas): Cards em coluna */
+    display: flex;
+    flex-direction: column; 
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* NOVO ESTILO: Card do Produto Único */
+.product-selection-card {
+    border: 2px solid #a020f0; /* Roxo */
+    box-shadow: 0 0 25px rgba(160, 32, 240, 0.8), 0 0 10px rgba(0, 0, 0, 0.5); 
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ESTILOS REMOVIDOS PARA PLACEHOLDER DE IMAGEM */
+
+.product-info h2 {
+    font-size: 1.5em;
+    text-align: center;
+    margin-bottom: 5px;
+    color: #a020f0; /* Roxo no nome do produto */
+    text-shadow: 0 0 10px rgba(160, 32, 240, 0.8);
+}
+
+/* NOVO ESTILO: Container de Vídeo Responsivo (16:9) */
+.video-container {
+    position: relative;
+    width: 100%;
+    /* Altura será 56.25% da largura (para 16:9) */
+    padding-bottom: 56.25%; 
+    height: 0;
+    margin: 10px 0 20px 0; 
+    border-radius: 8px;
+    overflow: hidden; 
+    box-shadow: 0 0 10px rgba(160, 32, 240, 0.5); 
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+/* FIM NOVO ESTILO: Container de Vídeo */
+
+
+/* ESTILO DO INDICADOR DE PREÇO (NA SEÇÃO CUPOM) */
+.price-indicator {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--azul-principal); 
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px; 
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.8); 
+}
+
+/* Mídia Query para telas MAIORES (Desktop/Tablet) */
+@media (min-width: 600px) {
+    .product-and-panel-wrapper {
+        /* Passa para o layout em grid (lado a lado) */
+        display: grid; 
+        grid-template-columns: 3fr 1fr; /* Layout: Produto (3 partes) e Painel (1 parte) */
+        gap: 25px;
+    }
+}
+
+/* ---------------------------------------------------- */
+/* Card PAINEL VIP (Tema Roxo) */
+/* ---------------------------------------------------- */
+.vip-panel-card {
+    /* Herda o estilo 'card' base */
+    border: 2px solid var(--roxo-vip); 
+    box-shadow: 0 0 25px var(--roxo-sombra), 0 0 10px rgba(0, 0, 0, 0.5); 
+    background-color: var(--fundo-secao); 
+    padding: 15px;
+    display: flex; 
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.vip-panel-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 35px var(--roxo-sombra), 0 0 10px rgba(0, 0, 0, 0.7);
+}
+
+.vip-panel-card h3 {
+    color: var(--roxo-claro);
+    text-shadow: 0 0 8px var(--roxo-sombra);
+    margin: 10px 0 5px 0;
+}
+
+.vip-panel-card p {
+    font-size: 0.8em;
+    color: var(--cinza-claro);
+    flex-grow: 1; /* Permite que o parágrafo ocupe o espaço extra */
+    margin-bottom: 15px;
+}
+
+.vip-panel-card .icon-big {
+    font-size: 2.5em;
+    line-height: 1;
+    color: var(--roxo-claro);
+    text-shadow: 0 0 10px var(--roxo-sombra);
+    margin-bottom: 5px;
+}
+
+.panel-access-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--roxo-vip); /* Cor do botão Roxo */
+    color: var(--branco-texto); 
+    border: none;
+    border-radius: 6px; 
+    font-size: 0.9em;
+    font-weight: bold; 
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px var(--roxo-sombra); 
+}
+
+.panel-access-btn:hover {
+    background-color: var(--roxo-claro); 
+    transform: translateY(-1px);
+}
+/* FIM DO NOVO CARD VIP */
+/* ---------------------------------------------------- */
+
 
 /* NOVO: Estilo para o Timer Fixo no Topo */
 #countdown-timer {
@@ -188,8 +292,6 @@ body {
     box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
 }
 
-/* ... (Estilos de vantagens e botões já existentes, apenas a seção de vídeo foi removida) ... */
-
 /* BOTÃO COMPRAR PRODUTO VIP - Ajustes de Texto e Animação */
 .buy-vip-open-btn {
     display: block;
@@ -203,7 +305,6 @@ body {
     font-weight: bolder; 
     cursor: pointer;
     margin-top: 20px;
-    margin-bottom: 20px; 
     transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -365,6 +466,5 @@ input[type=number] { -moz-appearance: textfield; }
     .advantages-grid {
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
     }
-}
-
+    }
     
