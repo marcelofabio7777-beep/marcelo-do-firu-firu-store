@@ -20,17 +20,9 @@
 
         <main class="product-info">
             
-            <section class="product-selection-card card" id="single-product-card">
-                <h2>HS PESCOÇO + HOLOGRAMA</h2>
-                <div class="product-image-placeholder">
-                    <span class="image-indicator">IMAGEM DO PRODUTO ROXO (FFH4X)</span>
-                </div>
-                <p class="price-indicator">Preço: $30.00</p>
-                
-                <button id="start-purchase-btn" class="buy-vip-open-btn">COMPRAR PRODUTO VIP</button>
-            </section>
-            
             <section class="coupon-section card"> 
+                <p class="price-indicator">Preço: R$30,00</p> 
+                
                 <p class="coupon-title">COLOQUE ALGUM CUPOM PARA OS PRODUTOS FICAR MAIS BARATO</p>
                 <label for="coupon-input">DIGITE CUPOM:</label>
                 <div class="coupon-input-group">
@@ -39,6 +31,31 @@
                 </div>
                 <p id="coupon-message" class="coupon-message"></p>
             </section>
+
+            <div class="product-and-panel-wrapper"> 
+                <section class="product-selection-card card" id="single-product-card">
+                    <h2>HS PESCOÇO + HOLOGRAMA</h2>
+                    
+                    <div class="video-container">
+                        <iframe
+                            src="https://www.youtube.com/embed/w44zIA73moQ?autoplay=0&controls=1&modestbranding=1"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                    
+                    <button id="start-purchase-btn" class="buy-vip-open-btn">COMPRAR PRODUTO VIP</button>
+                </section>
+                
+                <section class="vip-panel-card card" id="vip-panel-card"> 
+                    <div class="icon-big">👑</div>
+                    <h3>PAINEL VIP</h3>
+                    <p>Área exclusiva para membros e downloads rápidos.</p>
+                    <button id="access-panel-btn" class="panel-access-btn">ACESSAR</button>
+                </section>
+                
+            </div>
             
             <section id="exclusive-advantages-section">
                 <h3 class="advantages-title">✨ VANTAGENS EXCLUSIVAS ✨</h3>
@@ -125,5 +142,5 @@
 
     <script src="script.js"></script> 
 </body>
-                        </html>
-        
+    </html>
+    
