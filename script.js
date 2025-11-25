@@ -25,7 +25,7 @@ const INSTAGRAM_LINK_DIRECT = `https://ig.me/m/${INSTAGRAM_USERNAME}?ref=COMPRA-
 // --- Seletores DOM ---
 const timerDisplay = document.getElementById('timer-display');
 const countdownTimer = document.getElementById('countdown-timer');
-const priceIndicator = document.querySelector('.price-indicator');
+const priceIndicator = document.querySelector('.price-indicator'); // Agora na seção de cupom
 
 // Cupom
 const couponInput = document.getElementById('coupon-input');
@@ -50,6 +50,10 @@ const bankInfoDiv = document.getElementById('bank-info');
 const instagramInstructions = document.getElementById('instagram-instructions');
 const openInstagramBtn = document.getElementById('open-instagram-btn');
 
+// Painel VIP
+const vipPanelCard = document.getElementById('vip-panel-card');
+const accessPanelBtn = document.getElementById('access-panel-btn');
+
 
 // --- FUNÇÕES DE TIMER (Contagem regressiva) ---
 
@@ -72,7 +76,6 @@ function startTimer() {
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             timerDisplay.textContent = 'TEMPO ESGOTADO!';
-            // Lógica opcional para desativar a compra aqui.
         }
     }, 1000);
 }
@@ -80,6 +83,7 @@ function startTimer() {
 // --- FUNÇÕES DE LÓGICA TELA 1 (Cupom e Preço) ---
 
 function updatePriceDisplay() {
+    // Adiciona "R$" e formata para vírgula
     priceIndicator.textContent = `Preço: R$${currentProductPrice.toFixed(2).replace('.', ',')}`;
 }
 
@@ -93,8 +97,9 @@ applyCouponBtn.addEventListener('click', function() {
         messageElement.className = 'coupon-message success';
     } else {
         currentProductPrice = INITIAL_PRODUCT_PRICE;
-        messageElement.textContent = 'O cupom está incorreto ou vazio. Preço original mantido.';
-        messageElement.className = 'coupon-message incorrect';
+        // Mensagem de erro corrigida e em minúsculas:
+        messageElement.textContent = 'cupom incorreto.'; 
+        messageElement.className = 'coupon-message incorrect'; // Isso garante a cor vermelha
     }
     updatePriceDisplay();
 });
@@ -222,6 +227,22 @@ openInstagramBtn.addEventListener('click', function() {
     window.open(INSTAGRAM_LINK_DIRECT, '_blank');
 });
 
+// --- FUNÇÃO PAINEL VIP ---
+if (accessPanelBtn) {
+    accessPanelBtn.addEventListener('click', function() {
+        alert('PAINEL VIP TÁ EM CONSTRUÇÃO!');
+    });
+}
+if (vipPanelCard) {
+     vipPanelCard.addEventListener('click', function(event) {
+        // Verifica se o clique não foi no botão, para não disparar duas vezes
+        if (event.target !== accessPanelBtn) {
+            alert('PAINEL VIP TÁ EM CONSTRUÇÃO!');
+        }
+    });
+}
+
+
 // --- FUNÇÕES DE SCROLL (Para o Timer Fixo) ---
 
 function handleScroll() {
@@ -237,4 +258,4 @@ function handleScroll() {
 
 window.addEventListener('scroll', handleScroll);
 startTimer(); 
-updatePriceDisplay(); 
+updatePriceDisplay(); // Inicializa o display de preço
