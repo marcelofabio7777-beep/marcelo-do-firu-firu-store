@@ -25,7 +25,7 @@ const INSTAGRAM_LINK_DIRECT = `https://ig.me/m/${INSTAGRAM_USERNAME}?ref=COMPRA-
 // --- Seletores DOM ---
 const timerDisplay = document.getElementById('timer-display');
 const countdownTimer = document.getElementById('countdown-timer');
-const priceIndicator = document.querySelector('.price-indicator'); // Agora na seção de cupom
+const priceIndicator = document.querySelector('.price-indicator'); 
 
 // Cupom
 const couponInput = document.getElementById('coupon-input');
@@ -53,6 +53,72 @@ const openInstagramBtn = document.getElementById('open-instagram-btn');
 // Painel VIP
 const vipPanelCard = document.getElementById('vip-panel-card');
 const accessPanelBtn = document.getElementById('access-panel-btn');
+
+// Prova Social (Novo)
+const socialProofContainer = document.getElementById('social-proof-messages');
+
+// 50 Nomes para Prova Social (CRIADOS POR GEMINI)
+const SOCIAL_PROOF_NAMES = [
+    "Gabriel Santana", "Lucas Oliveira", "Maria Eduarda", "Pedro Costa", "Ana Luiza", 
+    "João Victor", "Isabela Lima", "Matheus Rocha", "Sofia Gomes", "Felipe Souza",
+    "Laura Mendes", "Daniel Pereira", "Beatriz Alves", "Guilherme Nunes", "Julia Ferreira",
+    "Rafael Martins", "Larissa Ribeiro", "Thiago Carvalho", "Manuela Silveira", "Alexandre Pires",
+    "Camila Castro", "Bruno Vieira", "Vitória Santos", "Diego Fernandes", "Giovanna Barbosa",
+    "Enzo Rodrigues", "Helena Dias", "Ricardo Melo", "Aline Freitas", "Vinicius Correia",
+    "Clara Azevedo", "Murilo Bernardes", "Emanuelly Dantas", "Heitor Campos", "Lívia Miranda",
+    "Gustavo Mendes", "Lorena Teixeira", "Otávio Farias", "Yasmin Cavalcanti", "Arthur Lins",
+    "Valentina Soares", "Samuel Magalhães", "Alice Sales", "Cauã Morais", "Rebeca Fonseca",
+    "César Dutra", "Mirella Queiroz", "Benício Guedes", "Letícia Pimentel", "David Zambotti"
+];
+
+// Variável para armazenar o índice do próximo nome a ser usado
+// Tenta buscar o índice salvo no localStorage (para que não repita o nome ao recarregar)
+let currentNameIndex = parseInt(localStorage.getItem('currentNameIndex')) || 0;
+
+
+// --- FUNÇÕES DE PROVA SOCIAL (Novo) ---
+
+function showSocialProof() {
+    // 1. Obter o próximo nome (e garantir o loop)
+    const purchaserName = SOCIAL_PROOF_NAMES[currentNameIndex % SOCIAL_PROOF_NAMES.length];
+    
+    // 2. Atualizar o índice para a próxima rodada (e salvar no localStorage)
+    currentNameIndex++;
+    if (currentNameIndex >= SOCIAL_PROOF_NAMES.length) {
+        currentNameIndex = 0; // Volta para 0 se atingir o final da lista
+    }
+    localStorage.setItem('currentNameIndex', currentNameIndex.toString());
+    
+    // 3. Criar a mensagem
+    const message = document.createElement('div');
+    message.className = 'notification-message';
+    message.innerHTML = `✅ <strong>${purchaserName}</strong> acabou de comprar Holograma`;
+
+    // 4. Adicionar e Mostrar (com pequeno delay para a transição funcionar)
+    socialProofContainer.appendChild(message);
+
+    setTimeout(() => {
+        message.classList.add('show');
+    }, 50);
+
+    // 5. Esconder e Remover (duração de 4 segundos)
+    setTimeout(() => {
+        message.classList.remove('show');
+        
+        // Remove completamente após a transição (0.5s definido no CSS)
+        setTimeout(() => {
+            message.remove();
+        }, 500); 
+    }, 4000); // Mensagem dura 4 segundos
+}
+
+function startSocialProofCycle() {
+    // A primeira mensagem aparece após 1 segundo
+    setTimeout(showSocialProof, 1000); 
+
+    // As mensagens seguintes aparecem a cada 6 segundos (6000ms)
+    setInterval(showSocialProof, 6000); 
+}
 
 
 // --- FUNÇÕES DE TIMER (Contagem regressiva) ---
@@ -99,7 +165,7 @@ applyCouponBtn.addEventListener('click', function() {
         currentProductPrice = INITIAL_PRODUCT_PRICE;
         // Mensagem de erro corrigida e em minúsculas:
         messageElement.textContent = 'cupom incorreto.'; 
-        messageElement.className = 'coupon-message incorrect'; // Isso garante a cor vermelha
+        messageElement.className = 'coupon-message incorrect'; 
     }
     updatePriceDisplay();
 });
@@ -259,3 +325,4 @@ function handleScroll() {
 window.addEventListener('scroll', handleScroll);
 startTimer(); 
 updatePriceDisplay(); // Inicializa o display de preço
+startSocialProofCycle(); // NOVO: Inicia o ciclo de mensagens
