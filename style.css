@@ -1,513 +1,346 @@
-/* Variáveis para cores (Azul, Preto e Amarelo Neon) */
-:root {
-    --azul-principal: #00f0ff; /* Azul Ciano Neon */
-    --azul-claro: #4dffff; /* Azul mais claro para toques sutis */
-    --amarelo-neon: #ffee00; /* Amarelo muito saturado e brilhante */
-    --preto-fundo: #0a0a0a; /* Preto Absoluto para o fundo */
-    --fundo-container: #1c1c1c; /* Fundo do container e seções (Preto Suave) */
-    --fundo-secao: #2c2c2c; /* Fundo mais claro para os cards/seções internas */
-    --branco-texto: #ffffff;
-    --cinza-claro: #cccccc;
-    --vermelho-erro: #e74c3c;
-    /* NOVO: Verde Neon brilhante */
-    --verde-neon: #39ff14; /* Verde neon bem brilhante */
-    --verde-neon-claro: #66ff33; /* Uma versão mais clara para o hover */
-    /* NOVO: Verde Escuro para a caixa de prova */
-    --verde-escuro-borda: #004d00; /* Verde escuro forte */
-    /* NOVO: Variáveis para o Card VIP Roxo */
-    --roxo-vip: #a020f0; /* Roxo padrão (Violet) */
-    --roxo-claro: #c678f5; /* Roxo para destaque */
-    --roxo-sombra: rgba(160, 32, 240, 0.8);
-    --roxo-sombra-clara: rgba(198, 120, 245, 0.9); /* Sombra mais clara para hover */
-    /* NOVO: Cor de fundo para a notificação */
-    --notificacao-fundo: #0d0d0d; 
-}
+// --- Variáveis Globais e Configurações ---
+const CORRECT_COUPON = 'MARCELO';
+const DISCOUNT_PERCENTAGE = 0.30; // 30%
+const TIMER_START_SECONDS = 7 * 60; // 7 minutos
+const PIX_KEY = '81997777361'; 
+const INSTAGRAM_USERNAME = 'marcelinho_zzs';
+const INSTAGRAM_MESSAGE = 'COMPREI O HS + HOLOGRAMA';
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: var(--preto-fundo); 
-    color: var(--branco-texto);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    overflow-x: hidden; 
+// CONSTANTES DE CONTEÚDO PARA MODAL DE ATENÇÃO (NOVO)
+const HS_PROOF_VIDEO_ID = '_CIaKvuol7s';
+const HS_PROOF_VIDEO_TITLE = 'PROVANDO QUE ESSE PRODUTO É BOM E 100% ANT BAN E ANT BLACKLIST';
+const VIP_PROOF_VIDEO_ID = 'rzVXUNIgt1w'; // Novo vídeo para o Painel VIP
+const VIP_PROOF_VIDEO_TITLE = 'XITANDO EM APOSTADO COM ESSE PAINEL VIP'; // Novo título
+
+// Tabela de preços dinâmicos por dia (Seu pedido)
+const DAY_PRICES = {
+    1: 5.0, 2: 6.0, 3: 8.0, 4: 10.0, 5: 13.0, 6: 15.0, 7: 18.0, 8: 20.0, 9: 22.0, 10: 24.0,
+    11: 26.0, 12: 28.0, 13: 30.0, 14: 31.0, 15: 32.0, 16: 34.0, 17: 36.0, 18: 38.0, 19: 39.0, 20: 40.0,
+    21: 42.0, 22: 44.0, 23: 46.0, 24: 48.0, 25: 50.0, 26: 51.0, 27: 52.0, 28: 53.0, 29: 55.0, 30: 60.0
+};
+
+const INITIAL_PRODUCT_PRICE = 30.00;
+let currentProductPrice = INITIAL_PRODUCT_PRICE;
+let finalPaymentPrice = 0;
+let daysSelected = 0;
+
+// Variável para rastrear qual produto está ativo na compra
+let activeProduct = 'HS'; // 'HS' (Pescoço) ou 'VIP' (Painel)
+
+// Cria o link de deep link
+const INSTAGRAM_LINK_DIRECT = `https://ig.me/m/${INSTAGRAM_USERNAME}?ref=COMPRA-SITE&text=${encodeURIComponent(INSTAGRAM_MESSAGE)}`;
+
+
+// --- Seletores DOM ---
+const timerDisplay = document.getElementById('timer-display');
+const countdownTimer = document.getElementById('countdown-timer');
+const priceIndicator = document.querySelector('.price-indicator'); 
+
+// Cupom
+const couponInput = document.getElementById('coupon-input');
+const couponMessage = document.getElementById('coupon-message');
+const applyCouponBtn = document.getElementById('apply-coupon-btn');
+
+// Modals e Botões
+const startPurchaseBtn = document.getElementById('start-purchase-btn'); // Botão do HS PESCOÇO
+const startVipPurchaseBtn = document.getElementById('start-vip-purchase-btn'); // NOVO: Botão do PAINEL VIP
+const attentionModal = document.getElementById('attention-modal');
+const closeBtns = document.querySelectorAll('.close-btn');
+const confirmModalBtn = document.getElementById('confirm-modal-btn');
+const durationModal = document.getElementById('duration-modal');
+const durationInput = document.getElementById('duration-input');
+const durationValidationMessage = document.getElementById('duration-validation-message');
+const paymentStepContent = document.getElementById('payment-step-content');
+const finalPriceElement = document.getElementById('final-price');
+
+// Pagamento
+const copyPixBtn = document.getElementById('copy-pix-btn');
+const copyFeedback = document.getElementById('copy-feedback');
+const bankInfoDiv = document.getElementById('bank-info');
+const instagramInstructions = document.getElementById('instagram-instructions');
+const openInstagramBtn = document.getElementById('open-instagram-btn');
+
+// Elementos do Modal de Atenção para alteração dinâmica
+const proofVideoIframe = document.querySelector('#attention-modal .proof-video-card iframe');
+const proofTitleElement = document.querySelector('#attention-modal .proof-video-card .proof-title');
+
+// Prova Social
+const socialProofContainer = document.getElementById('social-proof-messages');
+
+// 50 Nomes para Prova Social (CRIADOS POR GEMINI)
+const SOCIAL_PROOF_NAMES = [
+    "Gabriel Santana", "Lucas Oliveira", "Maria Eduarda", "Pedro Costa", "Ana Luiza", 
+    "João Victor", "Isabela Lima", "Matheus Rocha", "Sofia Gomes", "Felipe Souza",
+    "Laura Mendes", "Daniel Pereira", "Beatriz Alves", "Guilherme Nunes", "Julia Ferreira",
+    "Rafael Martins", "Larissa Ribeiro", "Thiago Carvalho", "Manuela Silveira", "Alexandre Pires",
+    "Camila Castro", "Bruno Vieira", "Vitória Santos", "Diego Fernandes", "Giovanna Barbosa",
+    "Enzo Rodrigues", "Helena Dias", "Ricardo Melo", "Aline Freitas", "Vinicius Correia",
+    "Clara Azevedo", "Murilo Bernardes", "Emanuelly Dantas", "Heitor Campos", "Lívia Miranda",
+    "Gustavo Mendes", "Lorena Teixeira", "Otávio Farias", "Yasmin Cavalcanti", "Arthur Lins",
+    "Valentina Soares", "Samuel Magalhães", "Alice Sales", "Cauã Morais", "Rebeca Fonseca",
+    "César Dutra", "Mirella Queiroz", "Benício Guedes", "Letícia Pimentel", "David Zambotti"
+];
+
+// Variável para armazenar o índice do próximo nome a ser usado
+// Tenta buscar o índice salvo no localStorage (para que não repita o nome ao recarregar)
+let currentNameIndex = parseInt(localStorage.getItem('currentNameIndex')) || 0;
+
+
+// --- FUNÇÕES DE PROVA SOCIAL ---
+
+function showSocialProof() {
+    // 1. Obter o próximo nome (e garantir o loop)
+    const purchaserName = SOCIAL_PROOF_NAMES[currentNameIndex % SOCIAL_PROOF_NAMES.length];
     
-    /* ANIMAÇÃO DE FUNDO - Gradiente em Movimento MAIS RÁPIDA */
-    background: linear-gradient(-45deg, #1c1c1c, #0a0a0a, #001f3f, #1c1c1c); 
-    background-size: 400% 400%;
-    animation: gradientShift 10s ease infinite; 
+    // 2. Atualizar o índice para a próxima rodada (e salvar no localStorage)
+    currentNameIndex++;
+    if (currentNameIndex >= SOCIAL_PROOF_NAMES.length) {
+        currentNameIndex = 0; // Volta para 0 se atingir o final da lista
+    }
+    localStorage.setItem('currentNameIndex', currentNameIndex.toString());
+    
+    // 3. Criar a mensagem
+    const message = document.createElement('div');
+    message.className = 'notification-message';
+    message.innerHTML = `✅ <strong>${purchaserName}</strong> acabou de comprar Holograma`;
+
+    // 4. Adicionar e Mostrar (com pequeno delay para a transição funcionar)
+    socialProofContainer.appendChild(message);
+
+    setTimeout(() => {
+        message.classList.add('show');
+    }, 50);
+
+    // 5. Esconder e Remover (duração de 4 segundos)
+    setTimeout(() => {
+        message.classList.remove('show');
+        
+        // Remove completamente após a transição (0.5s definido no CSS)
+        setTimeout(() => {
+            message.remove();
+        }, 500); 
+    }, 4000); // Mensagem dura 4 segundos
 }
 
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+function startSocialProofCycle() {
+    // A primeira mensagem aparece após 1 segundo
+    setTimeout(showSocialProof, 1000); 
+
+    // As mensagens seguintes aparecem a cada 6 segundos (6000ms)
+    setInterval(showSocialProof, 6000); 
 }
 
-.container {
-    width: 90%;
-    max-width: 600px;
-    background-color: transparent; 
-    padding: 20px;
-    margin-top: 30px;
-    margin-bottom: 30px;
-    z-index: 10; 
+
+// --- FUNÇÕES DE TIMER (Contagem regressiva) ---
+
+function formatTime(seconds) {
+    const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const sec = String(seconds % 60).padStart(2, '0');
+    return `${min}:${sec}`;
 }
 
-.header {
-    text-align: center;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-    border-bottom: 2px solid var(--azul-principal);
+let timerInterval;
+
+function startTimer() {
+    let timeLeft = TIMER_START_SECONDS;
+    timerDisplay.textContent = formatTime(timeLeft);
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = formatTime(timeLeft);
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerDisplay.textContent = 'TEMPO ESGOTADO!';
+        }
+    }, 1000);
 }
 
-.header h1 {
-    font-size: 1.8em;
-    color: var(--azul-claro);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 0 0 12px rgba(0, 240, 255, 1.0); 
+// --- FUNÇÕES DE LÓGICA TELA 1 (Cupom e Preço) ---
+
+function updatePriceDisplay() {
+    // Adiciona "R$" e formata para vírgula
+    priceIndicator.textContent = `Preço: R$${currentProductPrice.toFixed(2).replace('.', ',')}`;
 }
 
-/* ESTILO PARA CARDS GERAIS */
-.card {
-    padding: 20px;
-    background-color: var(--fundo-secao); 
-    border-radius: 12px;
-    margin-bottom: 20px;
-    text-align: center;
-    box-shadow: 0 0 20px rgba(0, 240, 255, 0.4), 0 0 8px rgba(0, 0, 0, 0.5); 
-    border: 1px solid rgba(0, 240, 255, 0.4); 
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+applyCouponBtn.addEventListener('click', function() {
+    const input = couponInput.value.trim();
+    const messageElement = couponMessage;
+    
+    if (input.toUpperCase() === CORRECT_COUPON) { 
+        currentProductPrice = INITIAL_PRODUCT_PRICE * (1 - DISCOUNT_PERCENTAGE);
+        messageElement.textContent = `🎉 Cupom aceito! 30% de desconto aplicado. Preço: R$${currentProductPrice.toFixed(2).replace('.', ',')} 🎉`;
+        messageElement.className = 'coupon-message success';
+    } else {
+        currentProductPrice = INITIAL_PRODUCT_PRICE;
+        // Mensagem de erro corrigida e em minúsculas:
+        messageElement.textContent = 'cupom incorreto.'; 
+        messageElement.className = 'coupon-message incorrect'; 
+    }
+    updatePriceDisplay();
+});
+
+
+// --- FUNÇÕES DE CONTROLE DE MODAL (Atualizadas) ---
+
+function openModal(modal) {
+    modal.style.display = 'block';
 }
 
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0 35px rgba(0, 240, 255, 0.7), 0 0 10px rgba(0, 0, 0, 0.7);
-}
-
-/* Container para alinhamento LADO A LADO */
-.product-and-panel-wrapper {
-    display: flex;
-    flex-direction: column; 
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-/* Card do Produto Único */
-.product-selection-card {
-    border: 2px solid #a020f0; 
-    box-shadow: 0 0 25px rgba(160, 32, 240, 0.8), 0 0 10px rgba(0, 0, 0, 0.5); 
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-}
-
-.product-info h2 {
-    font-size: 1.5em;
-    text-align: center;
-    margin-bottom: 5px;
-    color: #a020f0; 
-    text-shadow: 0 0 10px rgba(160, 32, 240, 0.8);
-}
-
-/* Container de Vídeo Responsivo (16:9) */
-.video-container {
-    position: relative;
-    width: 100%;
-    padding-bottom: 56.25%; 
-    height: 0;
-    margin: 10px 0 20px 0; 
-    border-radius: 8px;
-    overflow: hidden; 
-    box-shadow: 0 0 10px rgba(160, 32, 240, 0.5); 
-}
-
-.video-container iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-/* ESTILO DO INDICADOR DE PREÇO */
-.price-indicator {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: var(--azul-principal); 
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 20px; 
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.8); 
-}
-
-/* Mídia Query para telas MAIORES (Desktop/Tablet) */
-@media (min-width: 600px) {
-    .product-and-panel-wrapper {
-        display: grid; 
-        grid-template-columns: 3fr 1fr; 
-        gap: 25px;
+function updateAttentionModalContent(productType) {
+    if (productType === 'VIP') {
+        proofTitleElement.textContent = VIP_PROOF_VIDEO_TITLE;
+        // Não usamos autoplay no modal de atenção
+        proofVideoIframe.src = `https://www.youtube.com/embed/${VIP_PROOF_VIDEO_ID}?autoplay=0&controls=1&modestbranding=1`; 
+    } else { // HS
+        proofTitleElement.textContent = HS_PROOF_VIDEO_TITLE;
+        proofVideoIframe.src = `https://www.youtube.com/embed/${HS_PROOF_VIDEO_ID}?autoplay=0&controls=1&modestbranding=1`;
     }
 }
 
-/* Card PAINEL VIP (Tema Roxo) */
-.vip-panel-card {
-    border: 2px solid var(--roxo-vip); 
-    box-shadow: 0 0 25px var(--roxo-sombra), 0 0 10px rgba(0, 0, 0, 0.5); 
-    background-color: var(--fundo-secao); 
-    padding: 15px;
-    display: flex; 
-    flex-direction: column;
-    justify-content: space-between;
+function openAttentionModal(productType) {
+    activeProduct = productType;
+    updateAttentionModalContent(productType);
+    attentionModal.style.display = 'block';
 }
 
-/* --- ESTILOS DE CUPOM --- */
-.coupon-title {
-    color: var(--cinza-claro);
-    margin-bottom: 10px;
+function closeModal(modal) {
+    modal.style.display = 'none';
 }
 
-.coupon-section label {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 1.1em;
-    color: var(--azul-principal); 
-    text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+// Handler: Abre o Modal de Atenção (Produto 1 - HS PESCOÇO)
+startPurchaseBtn.addEventListener('click', () => {
+    openAttentionModal('HS');
+});
+
+// Handler: Abre o Modal de Atenção (Produto 2 - PAINEL VIP)
+if (startVipPurchaseBtn) { 
+    startVipPurchaseBtn.addEventListener('click', () => {
+        openAttentionModal('VIP');
+    });
 }
 
-.coupon-input-group {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
+// Handler: Fecha os Modals (Botão X)
+closeBtns.forEach(btn => btn.addEventListener('click', () => {
+    closeModal(attentionModal);
+    closeModal(durationModal);
+}));
 
-#coupon-input {
-    padding: 10px;
-    border: 2px solid var(--azul-principal);
-    border-radius: 5px;
-    background-color: #0d0d0d; 
-    color: var(--branco-texto);
-    width: 60%;
-    max-width: 200px;
-    box-sizing: border-box;
-    outline: none; 
-    box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
-}
+// Handler: Passa do Modal de Atenção para o Modal de Duração
+confirmModalBtn.addEventListener('click', () => {
+    closeModal(attentionModal);
+    openModal(durationModal);
+    // Limpa a entrada e mensagem de erro ao abrir
+    durationInput.value = '';
+    durationValidationMessage.textContent = '';
+    paymentStepContent.style.display = 'none';
+});
 
-/* Mensagem de Erro (para a cor vermelha) */
-.coupon-message.incorrect {
-    color: var(--vermelho-erro);
-    font-weight: bold;
-    margin-top: 10px;
-    font-size: 0.9em;
-}
+// --- FUNÇÕES DE LÓGICA MODAL DURAÇÃO ---
 
-/* BOTÃO COMPRAR PRODUTO VIP */
-.buy-vip-open-btn {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    background-color: var(--azul-principal);
-    color: var(--preto-fundo); 
-    border: none;
-    border-radius: 8px; 
-    font-size: 1.2em;
-    font-weight: bolder; 
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.7); 
-    text-shadow: 0 0 4px rgba(0, 0, 0, 0.2); 
-}
+durationInput.addEventListener('input', function() {
+    // 1. Limitar a entrada a 2 dígitos (ou 1 se for o caso)
+    let value = this.value.replace(/\D/g, ''); // Remove não-dígitos
+    if (value.length > 2) {
+        value = value.slice(0, 2);
+    }
+    this.value = value;
 
-/* ---------------------------------------------------- */
-/* AJUSTE DO TIMER FIXO NO TOPO - CENTRALIZADO */
-/* ---------------------------------------------------- */
-#countdown-timer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center; 
-    align-items: center;
+    daysSelected = parseInt(value);
+
+    // Esconde os detalhes do pagamento por padrão
+    paymentStepContent.style.display = 'none';
+    durationValidationMessage.textContent = '';
+    durationValidationMessage.className = 'validation-message';
+
+    if (isNaN(daysSelected) || daysSelected < 1) {
+        // Nada selecionado ou inválido, apenas retorna
+        return;
+    }
+
+    if (daysSelected > 30) {
+        durationValidationMessage.textContent = 'VOCÊ SÓ PODE ESCOLHER DE 1 A 30 DIAS';
+        durationValidationMessage.className = 'validation-message incorrect';
+        return;
+    }
     
-    background-color: rgba(28, 28, 28, 0.9); 
-    color: var(--cinza-claro);
-    padding: 8px 0;
-    font-size: 1.1em;
-    font-weight: bold;
-    z-index: 1000;
-    opacity: 1;
-    transition: opacity 0.3s;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.timer-text {
-    color: var(--cinza-claro); 
-    margin-right: 10px;
-    text-transform: uppercase;
-}
-
-.timer-value {
-    color: var(--vermelho-erro); 
-    text-shadow: none; 
-    font-weight: bold;
-    font-size: 1.1em;
-}
-
-.scrolled-timer {
-    opacity: 0.8; 
-}
-
-/* ---------------------------------------------------- */
-/* ESTILOS DE MODAL (TELA DE ATENÇÃO) */
-/* ---------------------------------------------------- */
-
-.modal-overlay {
-    display: none; 
-    position: fixed;
-    z-index: 2000; 
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.8); 
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    padding-top: 60px;
-}
-
-.modal-content {
-    background-color: var(--fundo-secao);
-    margin: 5% auto; 
-    padding: 30px;
-    border: 2px solid var(--azul-principal);
-    width: 85%; 
-    max-width: 380px; 
-    border-radius: 15px;
-    box-shadow: 0 0 30px rgba(0, 240, 255, 0.9);
-    position: relative;
-    animation: fadeIn 0.3s;
-}
-
-.modal-title {
-    color: var(--amarelo-neon);
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 20px;
-    text-shadow: 0 0 12px rgba(255, 238, 0, 0.8);
-    font-size: 1.4em;
-}
-
-/* LISTA DE ATENÇÃO MAIS ESTILIZADA E DESTACADA */
-.attention-list {
-    list-style: none;
-    padding: 0;
-    text-align: left;
-    margin-bottom: 30px;
-}
-
-.attention-list li {
-    background-color: #333;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: 1px solid rgba(57, 255, 20, 0.2);
-    border-left: 5px solid var(--verde-neon); 
-    font-size: 1em;
-    font-weight: bold;
-    color: var(--branco-texto);
-    box-shadow: 0 0 5px rgba(57, 255, 20, 0.4); 
-    transition: background-color 0.2s;
-}
-
-.attention-list li:hover {
-    background-color: #444;
-}
-
-
-/* NOVA CAIXA DE VÍDEO DE PROVA */
-.proof-video-card {
-    background-color: #101010; 
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    text-align: center;
-    border: 3px solid var(--verde-escuro-borda); 
-    box-shadow: 0 0 25px rgba(57, 255, 20, 0.8), inset 0 0 10px rgba(57, 255, 20, 0.5);
-}
-
-.proof-title {
-    color: var(--verde-neon);
-    font-weight: bold;
-    font-size: 1.05em;
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    text-shadow: 0 0 8px rgba(57, 255, 20, 0.8);
-}
-
-/* O .video-container dentro do proof-video-card */
-.proof-video-card .video-container {
-    margin: 0; 
-    box-shadow: none; 
-    border: 1px solid var(--verde-escuro-borda);
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-/* Estilos para o Modal de Duração */
-.duration-input-group {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-#duration-input {
-    width: 80px;
-    padding: 10px;
-    font-size: 1.2em;
-    text-align: center;
-    border: 2px solid var(--azul-principal);
-    border-radius: 5px 0 0 5px;
-    background-color: #0d0d0d;
-    color: var(--branco-texto);
-    outline: none;
-    box-sizing: border-box;
-}
-
-.input-suffix {
-    padding: 10px;
-    background-color: var(--azul-principal);
-    color: var(--preto-fundo);
-    font-weight: bold;
-    border-radius: 0 5px 5px 0;
-    font-size: 1.2em;
-}
-
-.buy-vip-submit-btn {
-    width: 100%;
-    padding: 12px;
-    background-color: var(--verde-neon); 
-    color: var(--preto-fundo); 
-    border: none;
-    border-radius: 8px; 
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-    text-transform: uppercase;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); 
-    box-shadow: 0 0 10px rgba(57, 255, 20, 0.8); 
-}
-
-/* Botão de Acesso ao Painel VIP */
-.panel-access-btn {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    background-color: var(--roxo-vip); 
-    color: var(--branco-texto); 
-    border: none;
-    border-radius: 8px;
-    font-size: 1.2em;
-    font-weight: bolder;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8); 
-    box-shadow: 0 0 15px var(--roxo-sombra); 
-}
-
-.panel-access-btn:hover {
-    background-color: var(--roxo-claro); 
-    transform: translateY(-2px);
-    box-shadow: 0 0 25px var(--roxo-sombra-clara), 0 0 10px rgba(0, 0, 0, 0.7); 
-}
-
-/* Estilos para o ícone da coroa no painel VIP */
-.vip-panel-card .icon-big {
-    font-size: 3em;
-    margin-bottom: 10px;
-    color: var(--amarelo-neon); 
-    text-shadow: 0 0 15px var(--amarelo-neon);
-}
-
-/* Estilo do título H3 do painel VIP */
-.vip-panel-card h3 {
-    color: var(--roxo-claro); 
-    text-shadow: 0 0 10px var(--roxo-sombra);
-    margin-bottom: 10px;
-}
-
-/* Estilo do parágrafo de descrição do painel VIP */
-.vip-panel-card p {
-    color: var(--cinza-claro);
-    font-size: 0.95em;
-    line-height: 1.5;
-}
-
-
-/* ---------------------------------------------------- */
-/* ESTILOS DE PROVA SOCIAL (NOTIFICAÇÕES) */
-/* ---------------------------------------------------- */
-#social-proof-messages {
-    position: fixed;
-    bottom: 15px; /* Quase lá embaixo */
-    left: 15px;  /* Lado esquerdo */
-    z-index: 100; /* Acima do conteúdo principal */
-    pointer-events: none; /* Permite cliques através da div principal */
-}
-
-.notification-message {
-    /* Estado Inicial: Fora da tela */
-    transform: translateX(-100%);
-    opacity: 0;
+    // 2. Cálculo do Preço
+    finalPaymentPrice = DAY_PRICES[daysSelected];
     
-    background-color: var(--notificacao-fundo); 
-    color: var(--branco-texto); /* Texto branco sem brilho */
-    font-size: 0.9em;
-    padding: 10px 15px;
-    border-radius: 8px;
-    border-left: 4px solid var(--azul-principal); /* Pequeno destaque visual */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Transição com efeito "pop" */
+    if (finalPaymentPrice) {
+        const priceFormatted = finalPaymentPrice.toFixed(2).replace('.', ',');
+        finalPriceElement.textContent = `R$${priceFormatted}`;
+        durationValidationMessage.textContent = `✅ ${daysSelected} dias selecionados. Preço: R$${priceFormatted}`;
+        durationValidationMessage.className = 'validation-message success';
+        
+        // Exibe a seção de pagamento
+        paymentStepContent.style.display = 'block';
+        
+        // Reseta informações de pagamento
+        copyFeedback.textContent = '';
+        bankInfoDiv.style.display = 'none';
+        openInstagramBtn.style.display = 'none';
+        instagramInstructions.style.display = 'none';
+    }
+});
+
+// Forçar o teclado numérico em dispositivos móveis (já feito com inputmode="numeric" no HTML, mas reforçando)
+durationInput.addEventListener('focus', function() {
+    this.setAttribute('inputmode', 'numeric');
+});
+
+// --- FUNÇÕES DE LÓGICA PAGAMENTO ---
+
+// Handler: Copia a chave PIX
+copyPixBtn.addEventListener('click', function() {
+    if (finalPaymentPrice === 0) {
+        copyFeedback.textContent = 'Selecione a duração antes de copiar.';
+        copyFeedback.className = 'incorrect';
+        return;
+    }
+
+    const priceFormatted = finalPaymentPrice.toFixed(2).replace('.', ',');
     
-    /* Garantir que apenas uma apareça de cada vez */
-    position: absolute; 
-    bottom: 0;
-    left: 0;
-    min-width: 220px;
-    max-width: 90vw;
-}
+    // Copia a chave Pix
+    navigator.clipboard.writeText(PIX_KEY)
+        .then(() => {
+            // Sucesso na cópia
+            copyFeedback.textContent = `✅ Chave PIX copiada com sucesso! Valor: R$${priceFormatted}`;
+            copyFeedback.className = 'success';
+            
+            // Mostra os detalhes do banco e o botão Instagram
+            bankInfoDiv.style.display = 'block';
+            openInstagramBtn.style.display = 'block';
+            instagramInstructions.style.display = 'block';
+        })
+        .catch(err => {
+            // Falha na cópia (fallback)
+            console.error('Falha ao copiar:', err);
+            copyFeedback.textContent = `Erro ao copiar (Copie manualmente): ${PIX_KEY}. Valor: R$${priceFormatted}`;
+            copyFeedback.className = 'incorrect';
+            bankInfoDiv.style.display = 'block'; // Mostra os dados mesmo com erro
+        });
+});
 
-.notification-message.show {
-    /* Estado Final: Na tela */
-    transform: translateX(0);
-    opacity: 1;
-}
+// Handler: Abre o Instagram no Direct com a mensagem pronta
+openInstagramBtn.addEventListener('click', function() {
+    window.open(INSTAGRAM_LINK_DIRECT, '_blank');
+});
 
-.notification-message strong {
-    color: var(--azul-principal); /* O nome pode ter um pequeno destaque */
-    font-weight: bold;
-}
+// --- FUNÇÕES DE SCROLL (Para o Timer Fixo) ---
 
-/* Media Query para telas menores, se necessário, para ajustar o tamanho */
-@media (max-width: 380px) {
-    .notification-message {
-        font-size: 0.85em;
-        padding: 8px 12px;
+function handleScroll() {
+    if (window.scrollY > 50) { // Se rolar mais de 50px
+        countdownTimer.classList.add('scrolled-timer');
+    } else {
+        countdownTimer.classList.remove('scrolled-timer');
     }
 }
+
+
+// --- Inicialização ---
+
+window.addEventListener('scroll', handleScroll);
+startTimer(); 
+updatePriceDisplay(); // Inicializa o display de preço
+startSocialProofCycle(); // Inicia o ciclo de mensagens
