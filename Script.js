@@ -1,328 +1,73 @@
-// --- Variáveis Globais e Configurações ---
-const CORRECT_COUPON = 'MARCELO';
-const DISCOUNT_PERCENTAGE = 0.30; // 30%
-const TIMER_START_SECONDS = 7 * 60; // 7 minutos
-const PIX_KEY = '81997777361'; 
-const INSTAGRAM_USERNAME = 'marcelinho_zzs';
-const INSTAGRAM_MESSAGE = 'COMPREI O HS + HOLOGRAMA';
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const mainContent = document.getElementById('mainContent');
+const paymentInterface = document.getElementById('paymentInterface');
+const plansContainer = document.getElementById('plansContainer');
 
-// Tabela de preços dinâmicos por dia (Seu pedido)
-const DAY_PRICES = {
-    1: 5.0, 2: 6.0, 3: 8.0, 4: 10.0, 5: 13.0, 6: 15.0, 7: 18.0, 8: 20.0, 9: 22.0, 10: 24.0,
-    11: 26.0, 12: 28.0, 13: 30.0, 14: 31.0, 15: 32.0, 16: 34.0, 17: 36.0, 18: 38.0, 19: 39.0, 20: 40.0,
-    21: 42.0, 22: 44.0, 23: 46.0, 24: 48.0, 25: 50.0, 26: 51.0, 27: 52.0, 28: 53.0, 29: 55.0, 30: 60.0
+const prices = {
+    "MOD IOS": { "5 dias": "24,00$", "7 dias": "27$", "15 dias": "47$" },
+    "MOD ANDROID": { "5 dias": "24,00$", "7 dias": "27$", "15 dias": "47$" },
+    "HS PEITO IOS": { "5 dias": "26,00$", "7 dias": "30,00$", "15 dias": "44,00$" },
+    "HS PEITO ANDROID": { "5 dias": "17,00$", "7 dias": "27,00$", "15 dias": "44,00$" }
 };
 
-const INITIAL_PRODUCT_PRICE = 30.00;
-let currentProductPrice = INITIAL_PRODUCT_PRICE;
-let finalPaymentPrice = 0;
-let daysSelected = 0;
-
-// Cria o link de deep link
-const INSTAGRAM_LINK_DIRECT = `https://ig.me/m/${INSTAGRAM_USERNAME}?ref=COMPRA-SITE&text=${encodeURIComponent(INSTAGRAM_MESSAGE)}`;
-
-
-// --- Seletores DOM ---
-const timerDisplay = document.getElementById('timer-display');
-const countdownTimer = document.getElementById('countdown-timer');
-const priceIndicator = document.querySelector('.price-indicator'); 
-
-// Cupom
-const couponInput = document.getElementById('coupon-input');
-const couponMessage = document.getElementById('coupon-message');
-const applyCouponBtn = document.getElementById('apply-coupon-btn');
-
-// Modals e Botões
-const startPurchaseBtn = document.getElementById('start-purchase-btn');
-const attentionModal = document.getElementById('attention-modal');
-const closeBtns = document.querySelectorAll('.close-btn');
-const confirmModalBtn = document.getElementById('confirm-modal-btn');
-const durationModal = document.getElementById('duration-modal');
-const durationInput = document.getElementById('duration-input');
-const durationValidationMessage = document.getElementById('duration-validation-message');
-const paymentStepContent = document.getElementById('payment-step-content');
-const finalPriceElement = document.getElementById('final-price');
-
-// Pagamento
-const copyPixBtn = document.getElementById('copy-pix-btn');
-const copyFeedback = document.getElementById('copy-feedback');
-const bankInfoDiv = document.getElementById('bank-info');
-const instagramInstructions = document.getElementById('instagram-instructions');
-const openInstagramBtn = document.getElementById('open-instagram-btn');
-
-// Painel VIP
-const vipPanelCard = document.getElementById('vip-panel-card');
-const accessPanelBtn = document.getElementById('access-panel-btn');
-
-// Prova Social (Novo)
-const socialProofContainer = document.getElementById('social-proof-messages');
-
-// 50 Nomes para Prova Social (CRIADOS POR GEMINI)
-const SOCIAL_PROOF_NAMES = [
-    "Gabriel Santana", "Lucas Oliveira", "Maria Eduarda", "Pedro Costa", "Ana Luiza", 
-    "João Victor", "Isabela Lima", "Matheus Rocha", "Sofia Gomes", "Felipe Souza",
-    "Laura Mendes", "Daniel Pereira", "Beatriz Alves", "Guilherme Nunes", "Julia Ferreira",
-    "Rafael Martins", "Larissa Ribeiro", "Thiago Carvalho", "Manuela Silveira", "Alexandre Pires",
-    "Camila Castro", "Bruno Vieira", "Vitória Santos", "Diego Fernandes", "Giovanna Barbosa",
-    "Enzo Rodrigues", "Helena Dias", "Ricardo Melo", "Aline Freitas", "Vinicius Correia",
-    "Clara Azevedo", "Murilo Bernardes", "Emanuelly Dantas", "Heitor Campos", "Lívia Miranda",
-    "Gustavo Mendes", "Lorena Teixeira", "Otávio Farias", "Yasmin Cavalcanti", "Arthur Lins",
-    "Valentina Soares", "Samuel Magalhães", "Alice Sales", "Cauã Morais", "Rebeca Fonseca",
-    "César Dutra", "Mirella Queiroz", "Benício Guedes", "Letícia Pimentel", "David Zambotti"
-];
-
-// Variável para armazenar o índice do próximo nome a ser usado
-// Tenta buscar o índice salvo no localStorage (para que não repita o nome ao recarregar)
-let currentNameIndex = parseInt(localStorage.getItem('currentNameIndex')) || 0;
-
-
-// --- FUNÇÕES DE PROVA SOCIAL (Novo) ---
-
-function showSocialProof() {
-    // 1. Obter o próximo nome (e garantir o loop)
-    const purchaserName = SOCIAL_PROOF_NAMES[currentNameIndex % SOCIAL_PROOF_NAMES.length];
-    
-    // 2. Atualizar o índice para a próxima rodada (e salvar no localStorage)
-    currentNameIndex++;
-    if (currentNameIndex >= SOCIAL_PROOF_NAMES.length) {
-        currentNameIndex = 0; // Volta para 0 se atingir o final da lista
-    }
-    localStorage.setItem('currentNameIndex', currentNameIndex.toString());
-    
-    // 3. Criar a mensagem
-    const message = document.createElement('div');
-    message.className = 'notification-message';
-    message.innerHTML = `✅ <strong>${purchaserName}</strong> acabou de comprar Holograma`;
-
-    // 4. Adicionar e Mostrar (com pequeno delay para a transição funcionar)
-    socialProofContainer.appendChild(message);
-
-    setTimeout(() => {
-        message.classList.add('show');
-    }, 50);
-
-    // 5. Esconder e Remover (duração de 4 segundos)
-    setTimeout(() => {
-        message.classList.remove('show');
-        
-        // Remove completamente após a transição (0.5s definido no CSS)
-        setTimeout(() => {
-            message.remove();
-        }, 500); 
-    }, 4000); // Mensagem dura 4 segundos
+function openPayment(name, img) {
+    document.getElementById('paymentProductTitle').innerText = name;
+    document.getElementById('paymentProductImg').src = img || "https://i.ibb.co/Y4YG8t0z/1000122868.jpg";
+    const p = prices[name];
+    plansContainer.innerHTML = `
+        <div class="plan-box grow-on-hover"><span>5 DIAS</span><span class="plan-price" style="color:#00ff00">${p["5 dias"]}</span><div class="buy-mini-box">COMPRAR</div></div>
+        <div class="plan-box grow-on-hover"><span>7 DIAS</span><span class="plan-price" style="color:#00ff00">${p["7 dias"]}</span><div class="buy-mini-box">COMPRAR</div></div>
+        <div class="plan-box grow-on-hover"><span>15 DIAS</span><span class="plan-price" style="color:#00ff00">${p["15 dias"]}</span><div class="buy-mini-box">COMPRAR</div></div>
+    `;
+    mainContent.style.display = 'none';
+    paymentInterface.style.display = 'block';
+    document.body.classList.add('payment-active');
 }
 
-function startSocialProofCycle() {
-    // A primeira mensagem aparece após 1 segundo
-    setTimeout(showSocialProof, 1000); 
+document.getElementById('backToStore').onclick = () => {
+    paymentInterface.style.display = 'none';
+    mainContent.style.display = 'block';
+    document.body.classList.remove('payment-active');
+};
 
-    // As mensagens seguintes aparecem a cada 6 segundos (6000ms)
-    setInterval(showSocialProof, 6000); 
+document.getElementById('openMenu').onclick = () => { sidebar.classList.add('active'); overlay.classList.add('active'); };
+document.getElementById('closeMenu').onclick = () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); };
+document.getElementById('menuVisual').onclick = (e) => { e.preventDefault(); document.getElementById('subMenuVisual').classList.toggle('active'); };
+
+function setTheme(color) {
+    document.documentElement.style.setProperty('--theme', color);
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
 }
 
+document.getElementById('btnRed').onclick = () => setTheme('#ff3333');
+document.getElementById('btnBlue').onclick = () => setTheme('#0055ff');
+document.getElementById('btnPurple').onclick = () => setTheme('#9933ff');
+document.getElementById('btnGreen').onclick = () => setTheme('#00cc44');
 
-// --- FUNÇÕES DE TIMER (Contagem regressiva) ---
-
-function formatTime(seconds) {
-    const min = String(Math.floor(seconds / 60)).padStart(2, '0');
-    const sec = String(seconds % 60).padStart(2, '0');
-    return `${min}:${sec}`;
-}
-
-let timerInterval;
-
-function startTimer() {
-    let timeLeft = TIMER_START_SECONDS;
-    timerDisplay.textContent = formatTime(timeLeft);
-
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        timerDisplay.textContent = formatTime(timeLeft);
-
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            timerDisplay.textContent = 'TEMPO ESGOTADO!';
-        }
-    }, 1000);
-}
-
-// --- FUNÇÕES DE LÓGICA TELA 1 (Cupom e Preço) ---
-
-function updatePriceDisplay() {
-    // Adiciona "R$" e formata para vírgula
-    priceIndicator.textContent = `Preço: R$${currentProductPrice.toFixed(2).replace('.', ',')}`;
-}
-
-applyCouponBtn.addEventListener('click', function() {
-    const input = couponInput.value.trim();
-    const messageElement = couponMessage;
-    
-    if (input.toUpperCase() === CORRECT_COUPON) { 
-        currentProductPrice = INITIAL_PRODUCT_PRICE * (1 - DISCOUNT_PERCENTAGE);
-        messageElement.textContent = `🎉 Cupom aceito! 30% de desconto aplicado. Preço: R$${currentProductPrice.toFixed(2).replace('.', ',')} 🎉`;
-        messageElement.className = 'coupon-message success';
-    } else {
-        currentProductPrice = INITIAL_PRODUCT_PRICE;
-        // Mensagem de erro corrigida e em minúsculas:
-        messageElement.textContent = 'cupom incorreto.'; 
-        messageElement.className = 'coupon-message incorrect'; 
-    }
-    updatePriceDisplay();
+const filterBtns = document.querySelectorAll('.f-btn');
+const products = document.querySelectorAll('.product-item');
+filterBtns.forEach(btn => {
+    btn.onclick = () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const f = btn.getAttribute('data-filter');
+        products.forEach(p => { p.style.display = (f === 'all' || p.classList.contains(f)) ? 'block' : 'none'; });
+    };
 });
 
-
-// --- FUNÇÕES DE CONTROLE DE MODAL ---
-
-function openModal(modal) {
-    modal.style.display = 'block';
-}
-
-function closeModal(modal) {
-    modal.style.display = 'none';
-}
-
-// Handler: Abre o Modal de Atenção
-startPurchaseBtn.addEventListener('click', () => {
-    openModal(attentionModal);
+document.addEventListener('click', (e) => {
+    const card = e.target.closest('.product-card-simple, .product-card-large');
+    if (card) openPayment(card.getAttribute('data-product'), card.getAttribute('data-img'));
 });
 
-// Handler: Fecha os Modals (Botão X)
-closeBtns.forEach(btn => btn.addEventListener('click', () => {
-    closeModal(attentionModal);
-    closeModal(durationModal);
-}));
-
-// Handler: Passa do Modal de Atenção para o Modal de Duração
-confirmModalBtn.addEventListener('click', () => {
-    closeModal(attentionModal);
-    openModal(durationModal);
-    // Limpa a entrada e mensagem de erro ao abrir
-    durationInput.value = '';
-    durationValidationMessage.textContent = '';
-    paymentStepContent.style.display = 'none';
-});
-
-// --- FUNÇÕES DE LÓGICA MODAL DURAÇÃO ---
-
-durationInput.addEventListener('input', function() {
-    // 1. Limitar a entrada a 2 dígitos (ou 1 se for o caso)
-    let value = this.value.replace(/\D/g, ''); // Remove não-dígitos
-    if (value.length > 2) {
-        value = value.slice(0, 2);
-    }
-    this.value = value;
-
-    daysSelected = parseInt(value);
-
-    // Esconde os detalhes do pagamento por padrão
-    paymentStepContent.style.display = 'none';
-    durationValidationMessage.textContent = '';
-    durationValidationMessage.className = 'validation-message';
-
-    if (isNaN(daysSelected) || daysSelected < 1) {
-        // Nada selecionado ou inválido, apenas retorna
-        return;
-    }
-
-    if (daysSelected > 30) {
-        durationValidationMessage.textContent = 'VOCÊ SÓ PODE ESCOLHER DE 1 A 30 DIAS';
-        durationValidationMessage.className = 'validation-message incorrect';
-        return;
-    }
-    
-    // 2. Cálculo do Preço
-    finalPaymentPrice = DAY_PRICES[daysSelected];
-    
-    if (finalPaymentPrice) {
-        const priceFormatted = finalPaymentPrice.toFixed(2).replace('.', ',');
-        finalPriceElement.textContent = `R$${priceFormatted}`;
-        durationValidationMessage.textContent = `✅ ${daysSelected} dias selecionados. Preço: R$${priceFormatted}`;
-        durationValidationMessage.className = 'validation-message success';
-        
-        // Exibe a seção de pagamento
-        paymentStepContent.style.display = 'block';
-        
-        // Reseta informações de pagamento
-        copyFeedback.textContent = '';
-        bankInfoDiv.style.display = 'none';
-        openInstagramBtn.style.display = 'none';
-        instagramInstructions.style.display = 'none';
-    }
-});
-
-// Forçar o teclado numérico em dispositivos móveis (já feito com inputmode="numeric" no HTML, mas reforçando)
-durationInput.addEventListener('focus', function() {
-    this.setAttribute('inputmode', 'numeric');
-});
-
-// --- FUNÇÕES DE LÓGICA PAGAMENTO ---
-
-// Handler: Copia a chave PIX
-copyPixBtn.addEventListener('click', function() {
-    if (finalPaymentPrice === 0) {
-        copyFeedback.textContent = 'Selecione a duração antes de copiar.';
-        copyFeedback.className = 'incorrect';
-        return;
-    }
-
-    const priceFormatted = finalPaymentPrice.toFixed(2).replace('.', ',');
-    
-    // Copia a chave Pix
-    navigator.clipboard.writeText(PIX_KEY)
-        .then(() => {
-            // Sucesso na cópia
-            copyFeedback.textContent = `✅ Chave PIX copiada com sucesso! Valor: R$${priceFormatted}`;
-            copyFeedback.className = 'success';
-            
-            // Mostra os detalhes do banco e o botão Instagram
-            bankInfoDiv.style.display = 'block';
-            openInstagramBtn.style.display = 'block';
-            instagramInstructions.style.display = 'block';
-        })
-        .catch(err => {
-            // Falha na cópia (fallback)
-            console.error('Falha ao copiar:', err);
-            copyFeedback.textContent = `Erro ao copiar (Copie manualmente): ${PIX_KEY}. Valor: R$${priceFormatted}`;
-            copyFeedback.className = 'incorrect';
-            bankInfoDiv.style.display = 'block'; // Mostra os dados mesmo com erro
-        });
-});
-
-// Handler: Abre o Instagram no Direct com a mensagem pronta
-openInstagramBtn.addEventListener('click', function() {
-    window.open(INSTAGRAM_LINK_DIRECT, '_blank');
-});
-
-// --- FUNÇÃO PAINEL VIP ---
-if (accessPanelBtn) {
-    accessPanelBtn.addEventListener('click', function() {
-        alert('PAINEL VIP TÁ EM CONSTRUÇÃO!');
-    });
-}
-if (vipPanelCard) {
-     vipPanelCard.addEventListener('click', function(event) {
-        // Verifica se o clique não foi no botão, para não disparar duas vezes
-        if (event.target !== accessPanelBtn) {
-            alert('PAINEL VIP TÁ EM CONSTRUÇÃO!');
-        }
-    });
-}
-
-
-// --- FUNÇÕES DE SCROLL (Para o Timer Fixo) ---
-
-function handleScroll() {
-    if (window.scrollY > 50) { // Se rolar mais de 50px
-        countdownTimer.classList.add('scrolled-timer');
-    } else {
-        countdownTimer.classList.remove('scrolled-timer');
-    }
-}
-
-
-// --- Inicialização ---
-
-window.addEventListener('scroll', handleScroll);
-startTimer(); 
-updatePriceDisplay(); // Inicializa o display de preço
-startSocialProofCycle(); // NOVO: Inicia o ciclo de mensagens
+setInterval(() => {
+    const names = ["Felipe", "Marcos", "Luan", "Julia"];
+    const container = document.getElementById('notification-container');
+    const div = document.createElement('div');
+    div.className = 'notification';
+    div.innerHTML = `<strong>${names[Math.floor(Math.random()*names.length)]}</strong> comprou agora!`;
+    container.appendChild(div);
+    setTimeout(() => div.remove(), 4000);
+}, 10000);
