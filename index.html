@@ -3,166 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loja de Marcelo do Firu Firu - HS PESCOÇO</title>
-    <link rel="stylesheet" href="style.css"> 
+    <title>Gabzin Modz FF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="theme-red">
 
-    <div id="countdown-timer" class="fixed-timer">
-        <span class="timer-text">COMPRE ANTES QUE O TEMPO ACABE:</span>
-        <span id="timer-display" class="timer-value">07:00</span>
-    </div>
-
-    <div class="container">
-        <header class="header">
-            <h1>LOJA DE MARCELO DO FIRU FIRU</h1>
-        </header>
-
-        <main class="product-info">
-            
-            <section class="coupon-section card"> 
-                <p class="price-indicator">Preço: R$30,00</p> 
-                
-                <p class="coupon-title">COLOQUE ALGUM CUPOM PARA OS PRODUTOS FICAR MAIS BARATO</p>
-                <label for="coupon-input">DIGITE CUPOM:</label>
-                <div class="coupon-input-group">
-                    <input type="text" id="coupon-input" placeholder="SEU CUPOM">
-                    <button id="apply-coupon-btn">Aplicar</button>
-                </div>
-                <p id="coupon-message" class="coupon-message"></p>
-            </section>
-
-            <div class="product-and-panel-wrapper"> 
-                <section class="product-selection-card card" id="single-product-card">
-                    <h2>HS PESCOÇO + HOLOGRAMA</h2>
-                    
-                    <div class="video-container">
-                        <iframe
-                            src="https://www.youtube.com/embed/pc_M-ndG5Js?autoplay=0&controls=1&modestbranding=1"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen
-                        ></iframe>
-                    </div>
-                    
-                    <button id="start-purchase-btn" class="buy-vip-open-btn">COMPRAR PRODUTO VIP</button>
-                </section>
-                
-                <section class="vip-panel-card card" id="vip-panel-card"> 
-                    <div class="icon-big">👑</div>
-                    <h3>PAINEL VIP</h3>
-                    <div class="video-container">
-                        <iframe
-                            src="https://www.youtube.com/embed/eui0jcH3aMc?autoplay=0&controls=1&modestbranding=1"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen
-                        ></iframe>
-                    </div>
-                    <button id="start-vip-purchase-btn" class="buy-vip-open-btn">COMPRAR PRODUTO VIP</button>
-                </section>
-                
-            </div>
-            
-            <section id="exclusive-advantages-section">
-                <h3 class="advantages-title">✨ VANTAGENS EXCLUSIVAS ✨</h3>
-                <div class="advantages-grid">
-                    
-                    <div class="advantage-card card">
-                        <span class="icon">⚡</span>
-                        <h4>Entrega Imediata</h4>
-                        <p>Liberação automática via Instagram após a confirmação do pagamento PIX.</p>
-                    </div>
-
-                    <div class="advantage-card card">
-                        <span class="icon">🛡️</span>
-                        <h4>Garantia Total</h4>
-                        <p>7 dias de garantia incondicional em todos os produtos, sem pegadinhas.</p>
-                    </div>
-
-                    <div class="advantage-card card">
-                        <span class="icon">💬</span>
-                        <h4>Suporte 24h</h4>
-                        <p>Atendimento e suporte especializado via Instagram/WhatsApp a qualquer hora.</p>
-                    </div>
-
-                    </div>
-            </section>
-        </main>
-    </div>
-
-    <div id="attention-modal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h3 class="modal-title">ATENÇÃO</h3>
-            
-            <ul class="attention-list">
-                <li>1: esse produto é 100% ant ban e ant blacklist ✔️</li>
-                <li>2: suporte 24hrs no Instagram ✔️</li>
-                <li>3: oferecemos 7 dias de garantia ✔️</li>
-                <li>4: esse produto tem bypass 100% garantido para que nenhum analista ache nós apostado ✔️</li>
-            </ul>
-
-            <div class="proof-video-card">
-                <p class="proof-title">PROVANDO QUE ESSE PRODUTO É BOM E 100% ANT BAN E ANT BLACKLIST</p>
-                <div class="video-container">
-                    <iframe
-                        src="https://www.youtube.com/embed/_CIaKvuol7s?autoplay=0&controls=1&modestbranding=1"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen
-                    ></iframe>
-                </div>
-            </div>
-
-            <button id="confirm-modal-btn" class="buy-vip-submit-btn">COMPRAR PRODUTO VIP</button>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" id="closeMenu">&times;</button>
+        <div class="sidebar-header">
+            <div class="lock-icon"><i class="fas fa-lock"></i></div>
+            <p>Menu</p>
         </div>
-    </div>
-    
-    <div id="duration-modal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-btn duration-close-btn">&times;</span>
-            <h3 class="modal-title">DIGITE QUANTOS DIAS VOCÊ QUER PASSAR COM O PRODUTO</h3>
-            
-            <div class="duration-input-group">
-                <input type="number" id="duration-input" placeholder="1 a 30" min="1" max="30" inputmode="numeric">
-                <span class="input-suffix">DIAS</span>
-            </div>
-            
-            <p id="duration-validation-message" class="validation-message"></p>
-            
-            <div id="payment-step-content" style="display: none; margin-top: 20px;">
-                <h4 style="color: var(--cinza-claro); margin-bottom: 5px;">VALOR A PAGAR</h4>
-                <p id="final-price" class="price" style="font-size: 2em; margin-bottom: 20px; color: var(--azul-principal);">$0.00</p> 
-                
-                <button id="copy-pix-btn" class="buy-vip-submit-btn" style="background-color: var(--verde-neon); width: 100%; padding: 15px;">
-                    COPIAR CHAVE PIX
-                </button>
-                <p id="copy-feedback" style="margin-top: 10px; font-weight: bold;"></p>
-
-                <div id="bank-info" class="payment-info" style="display: none;">
-                    <h4>Dados do Recebedor:</h4>
-                    <div class="bank-details">
-                        <p>Banco: (Picpay)</p>
-                        <p>Nome: (João Pedro de lima)</p>
-                        <p>Chave PIX: (81997777361)</p>
-                    </div>
-                    <p class="alert-warning">SÓ PAGUE SE REALMENTE APARECER ESSES DESSES DADOS DE NOME E BANCO ACIMA.</p>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" id="menuHome"><i class="fas fa-home"></i> Home</a>
+            <div class="menu-item-with-sub">
+                <a href="#" class="nav-item" id="menuVisual"><i class="fas fa-palette"></i> Visual <i class="fas fa-chevron-down"></i></a>
+                <div class="sub-menu" id="subMenuVisual">
+                    <a href="#" class="sub-nav-item" id="btnRed">Vermelho</a>
+                    <a href="#" class="sub-nav-item" id="btnBlue">Azul</a>
+                    <a href="#" class="sub-nav-item" id="btnPurple">Roxo</a>
+                    <a href="#" class="sub-nav-item" id="btnGreen">Verde</a>
                 </div>
-                
-                <p id="instagram-instructions" style="margin-top: 20px; font-size: 0.9em; color: var(--cinza-claro); display: none;">
-                    APÓS O PIX, SALVE O COMPROVANTE E CLIQUE EM ABRIR INSTAGRAM. MANDE O COMPROVANTE E VOCÊ RECEBERÁ OS LINKS DE DOWNLOAD E TUTORIAL.
-                </p>
+            </div>
+        </nav>
+    </div>
+    <div class="overlay" id="overlay"></div>
 
-                <button id="open-instagram-btn" class="buy-vip-submit-btn instagram-btn" style="display: none;">
-                    ABRIR INSTAGRAM
-                </button>
+    <header>
+        <div class="container header-content">
+            <button class="menu-toggle neon-border-box" id="openMenu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo-area-central">
+                <div class="logo-circle-img grow-on-hover">
+                    <img src="https://i.ibb.co/Y4YG8t0z/1000122868.jpg" alt="Logo">
+                </div>
+                <h1 class="glow-text">GABZIN MODZ FF</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" id="mainContent">
+        <section class="hero grow-on-hover" id="homeSection">
+            <p class="video-label">Demonstração do painel VIP mais barato</p>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/kRZ1hLNjud0" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <h2 class="section-title">✨ Vantagens exclusivas ✨</h2>
+        <div class="cards-grid">
+            <div class="card grow-on-hover"><i class="fas fa-truck icon-theme"></i><h3>Entrega Imediata</h3><p>Liberação automática</p></div>
+            <div class="card grow-on-hover"><i class="fas fa-comments icon-theme"></i><h3>Suporte 24h</h3><p>Atendimento via WhatsApp</p></div>
+            <div class="card grow-on-hover"><i class="fas fa-shield-alt icon-theme"></i><h3>Garantia</h3><p>7 dias de garantia</p></div>
+            <div class="card grow-on-hover"><i class="fas fa-sync icon-theme"></i><h3>Atualizações</h3><p>Grátis e sem custo</p></div>
+        </div>
+
+        <section class="how-it-works">
+            <h2 class="section-title">Como funciona a compra?</h2>
+            <div class="steps-container">
+                <div class="step-card grow-on-hover">
+                    <span class="step-num">1</span>
+                    <div><h4>Escolha</h4><p>Selecione seu painel favorito.</p></div>
+                </div>
+                <div class="step-card grow-on-hover">
+                    <span class="step-num">2</span>
+                    <div><h4>Receba</h4><p>O link chega no seu e-mail.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="filter-box" id="filterSection">
+            <h2 class="title-theme">Filtrar Produtos</h2>
+            <div class="filter-group">
+                <div class="btn-group">
+                    <button class="f-btn active grow-on-hover" data-filter="all">Todos</button>
+                    <button class="f-btn grow-on-hover" data-filter="android">Android</button>
+                    <button class="f-btn grow-on-hover" data-filter="ios">iOS</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="products-row">
+            <div class="product-card-simple product-item ios grow-on-hover" data-product="MOD IOS" data-img="https://i.ibb.co/ZznzBY8c/1000122869.jpg">
+                <div class="product-img-wrapper"><img src="https://i.ibb.co/ZznzBY8c/1000122869.jpg"></div>
+                <h3>MOD IOS</h3>
+            </div>
+            <div class="product-card-simple product-item android grow-on-hover" data-product="MOD ANDROID" data-img="https://i.ibb.co/Y4L3B9Lb/Screenshot-20260228-171903-Gallery.jpg">
+                <div class="product-img-wrapper"><img src="https://i.ibb.co/Y4L3B9Lb/Screenshot-20260228-171903-Gallery.jpg"></div>
+                <h3>MOD ANDROID</h3>
+            </div>
+
+            <div class="product-card-large product-item ios neon-flow grow-on-hover" data-product="HS PEITO IOS" data-img="">
+                <div class="large-img-wrapper"><div class="animated-bg-overlay"></div><span>HS PEITO IOS</span></div>
+                <h3>HS PEITO IOS</h3>
+            </div>
+            <div class="product-card-large product-item android neon-flow grow-on-hover" data-product="HS PEITO ANDROID" data-img="">
+                <div class="large-img-wrapper"><div class="animated-bg-overlay"></div><span>HS PEITO ANDROID</span></div>
+                <h3>HS PEITO ANDROID</h3>
+            </div>
+        </div>
+    </main>
+
+    <div class="container payment-interface" id="paymentInterface" style="display: none;">
+        <div class="payment-card-outer">
+            <div class="payment-card">
+                <button class="back-btn grow-on-hover" id="backToStore"><i class="fas fa-arrow-left"></i> Voltar</button>
+                <div class="payment-header-img"><img id="paymentProductImg" src=""><h2 id="paymentProductTitle">PRODUTO</h2></div>
+                <p class="payment-subtitle">SELECIONE O PLANO E PAGUE AGORA!</p>
+                <div class="plans-container" id="plansContainer"></div>
             </div>
         </div>
     </div>
-    
-    <div id="social-proof-messages"></div>
 
-    <script src="script.js"></script> 
+    <div id="notification-container"></div>
+    <script src="script.js"></script>
 </body>
 </html>
