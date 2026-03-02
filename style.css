@@ -1,346 +1,101 @@
-// --- Variáveis Globais e Configurações ---
-const CORRECT_COUPON = 'MARCELO';
-const DISCOUNT_PERCENTAGE = 0.30; // 30%
-const TIMER_START_SECONDS = 7 * 60; // 7 minutos
-const PIX_KEY = '81997777361'; 
-const INSTAGRAM_USERNAME = 'marcelinho_zzs';
-const INSTAGRAM_MESSAGE = 'COMPREI O HS + HOLOGRAMA';
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
-// CONSTANTES DE CONTEÚDO PARA MODAL DE ATENÇÃO (NOVO)
-const HS_PROOF_VIDEO_ID = '_CIaKvuol7s';
-const HS_PROOF_VIDEO_TITLE = 'PROVANDO QUE ESSE PRODUTO É BOM E 100% ANT BAN E ANT BLACKLIST';
-const VIP_PROOF_VIDEO_ID = 'rzVXUNIgt1w'; // Novo vídeo para o Painel VIP
-const VIP_PROOF_VIDEO_TITLE = 'XITANDO EM APOSTADO COM ESSE PAINEL VIP'; // Novo título
-
-// Tabela de preços dinâmicos por dia (Seu pedido)
-const DAY_PRICES = {
-    1: 5.0, 2: 6.0, 3: 8.0, 4: 10.0, 5: 13.0, 6: 15.0, 7: 18.0, 8: 20.0, 9: 22.0, 10: 24.0,
-    11: 26.0, 12: 28.0, 13: 30.0, 14: 31.0, 15: 32.0, 16: 34.0, 17: 36.0, 18: 38.0, 19: 39.0, 20: 40.0,
-    21: 42.0, 22: 44.0, 23: 46.0, 24: 48.0, 25: 50.0, 26: 51.0, 27: 52.0, 28: 53.0, 29: 55.0, 30: 60.0
-};
-
-const INITIAL_PRODUCT_PRICE = 30.00;
-let currentProductPrice = INITIAL_PRODUCT_PRICE;
-let finalPaymentPrice = 0;
-let daysSelected = 0;
-
-// Variável para rastrear qual produto está ativo na compra
-let activeProduct = 'HS'; // 'HS' (Pescoço) ou 'VIP' (Painel)
-
-// Cria o link de deep link
-const INSTAGRAM_LINK_DIRECT = `https://ig.me/m/${INSTAGRAM_USERNAME}?ref=COMPRA-SITE&text=${encodeURIComponent(INSTAGRAM_MESSAGE)}`;
-
-
-// --- Seletores DOM ---
-const timerDisplay = document.getElementById('timer-display');
-const countdownTimer = document.getElementById('countdown-timer');
-const priceIndicator = document.querySelector('.price-indicator'); 
-
-// Cupom
-const couponInput = document.getElementById('coupon-input');
-const couponMessage = document.getElementById('coupon-message');
-const applyCouponBtn = document.getElementById('apply-coupon-btn');
-
-// Modals e Botões
-const startPurchaseBtn = document.getElementById('start-purchase-btn'); // Botão do HS PESCOÇO
-const startVipPurchaseBtn = document.getElementById('start-vip-purchase-btn'); // NOVO: Botão do PAINEL VIP
-const attentionModal = document.getElementById('attention-modal');
-const closeBtns = document.querySelectorAll('.close-btn');
-const confirmModalBtn = document.getElementById('confirm-modal-btn');
-const durationModal = document.getElementById('duration-modal');
-const durationInput = document.getElementById('duration-input');
-const durationValidationMessage = document.getElementById('duration-validation-message');
-const paymentStepContent = document.getElementById('payment-step-content');
-const finalPriceElement = document.getElementById('final-price');
-
-// Pagamento
-const copyPixBtn = document.getElementById('copy-pix-btn');
-const copyFeedback = document.getElementById('copy-feedback');
-const bankInfoDiv = document.getElementById('bank-info');
-const instagramInstructions = document.getElementById('instagram-instructions');
-const openInstagramBtn = document.getElementById('open-instagram-btn');
-
-// Elementos do Modal de Atenção para alteração dinâmica
-const proofVideoIframe = document.querySelector('#attention-modal .proof-video-card iframe');
-const proofTitleElement = document.querySelector('#attention-modal .proof-video-card .proof-title');
-
-// Prova Social
-const socialProofContainer = document.getElementById('social-proof-messages');
-
-// 50 Nomes para Prova Social (CRIADOS POR GEMINI)
-const SOCIAL_PROOF_NAMES = [
-    "Gabriel Santana", "Lucas Oliveira", "Maria Eduarda", "Pedro Costa", "Ana Luiza", 
-    "João Victor", "Isabela Lima", "Matheus Rocha", "Sofia Gomes", "Felipe Souza",
-    "Laura Mendes", "Daniel Pereira", "Beatriz Alves", "Guilherme Nunes", "Julia Ferreira",
-    "Rafael Martins", "Larissa Ribeiro", "Thiago Carvalho", "Manuela Silveira", "Alexandre Pires",
-    "Camila Castro", "Bruno Vieira", "Vitória Santos", "Diego Fernandes", "Giovanna Barbosa",
-    "Enzo Rodrigues", "Helena Dias", "Ricardo Melo", "Aline Freitas", "Vinicius Correia",
-    "Clara Azevedo", "Murilo Bernardes", "Emanuelly Dantas", "Heitor Campos", "Lívia Miranda",
-    "Gustavo Mendes", "Lorena Teixeira", "Otávio Farias", "Yasmin Cavalcanti", "Arthur Lins",
-    "Valentina Soares", "Samuel Magalhães", "Alice Sales", "Cauã Morais", "Rebeca Fonseca",
-    "César Dutra", "Mirella Queiroz", "Benício Guedes", "Letícia Pimentel", "David Zambotti"
-];
-
-// Variável para armazenar o índice do próximo nome a ser usado
-// Tenta buscar o índice salvo no localStorage (para que não repita o nome ao recarregar)
-let currentNameIndex = parseInt(localStorage.getItem('currentNameIndex')) || 0;
-
-
-// --- FUNÇÕES DE PROVA SOCIAL ---
-
-function showSocialProof() {
-    // 1. Obter o próximo nome (e garantir o loop)
-    const purchaserName = SOCIAL_PROOF_NAMES[currentNameIndex % SOCIAL_PROOF_NAMES.length];
-    
-    // 2. Atualizar o índice para a próxima rodada (e salvar no localStorage)
-    currentNameIndex++;
-    if (currentNameIndex >= SOCIAL_PROOF_NAMES.length) {
-        currentNameIndex = 0; // Volta para 0 se atingir o final da lista
-    }
-    localStorage.setItem('currentNameIndex', currentNameIndex.toString());
-    
-    // 3. Criar a mensagem
-    const message = document.createElement('div');
-    message.className = 'notification-message';
-    message.innerHTML = `✅ <strong>${purchaserName}</strong> acabou de comprar Holograma`;
-
-    // 4. Adicionar e Mostrar (com pequeno delay para a transição funcionar)
-    socialProofContainer.appendChild(message);
-
-    setTimeout(() => {
-        message.classList.add('show');
-    }, 50);
-
-    // 5. Esconder e Remover (duração de 4 segundos)
-    setTimeout(() => {
-        message.classList.remove('show');
-        
-        // Remove completamente após a transição (0.5s definido no CSS)
-        setTimeout(() => {
-            message.remove();
-        }, 500); 
-    }, 4000); // Mensagem dura 4 segundos
+:root { 
+    --theme: #ff3333; 
+    --bg: #080808; 
+    --card: #121212; 
+    --green-neon: #00ff00;
+    --cyan-neon: #00ffff;
 }
 
-function startSocialProofCycle() {
-    // A primeira mensagem aparece após 1 segundo
-    setTimeout(showSocialProof, 1000); 
+* { margin: 0; padding: 0; box-sizing: border-box; transition: transform 0.2s, background 0.3s; }
+body { background: var(--bg); color: white; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
 
-    // As mensagens seguintes aparecem a cada 6 segundos (6000ms)
-    setInterval(showSocialProof, 6000); 
+/* CRESCER AO TOCAR */
+.grow-on-hover:active, .grow-on-hover:hover { transform: scale(1.03); }
+
+.container { padding: 0 20px; max-width: 500px; margin: 0 auto; }
+
+/* BOTÃO MENU COM CAIXA NEON ANIMADA */
+.menu-toggle.neon-border-box {
+    position: fixed; left: 20px; top: 20px; 
+    background: #000; color: white; border: 2px solid var(--theme); 
+    padding: 10px 15px; border-radius: 10px; z-index: 1001; cursor: pointer;
+    box-shadow: 0 0 10px var(--theme);
+    animation: neonPulse 1.5s infinite alternate;
+}
+@keyframes neonPulse {
+    from { box-shadow: 0 0 5px var(--theme); }
+    to { box-shadow: 0 0 15px var(--theme), inset 0 0 5px var(--theme); }
 }
 
+/* LOGO CENTRAL */
+.logo-area-central { text-align: center; margin-top: 20px; }
+.logo-circle-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--theme); box-shadow: 0 0 20px var(--theme); overflow: hidden; margin: 0 auto 15px; }
+.logo-circle-img img { width: 100%; height: 100%; object-fit: cover; }
+.glow-text { font-size: 24px; text-shadow: 0 0 10px var(--theme); }
 
-// --- FUNÇÕES DE TIMER (Contagem regressiva) ---
-
-function formatTime(seconds) {
-    const min = String(Math.floor(seconds / 60)).padStart(2, '0');
-    const sec = String(seconds % 60).padStart(2, '0');
-    return `${min}:${sec}`;
+/* VÍDEO AJUSTADO PARA PREENCHER BORDAS */
+.video-container { 
+    width: 100%; 
+    aspect-ratio: 16/9; 
+    border-radius: 25px; 
+    border: 4px solid var(--theme); 
+    box-shadow: 0 0 15px var(--theme);
+    overflow: hidden; 
+    position: relative;
+    background: #000;
+}
+.video-container iframe { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
 }
 
-let timerInterval;
+/* GRADE DE VANTAGENS 2X2 */
+.cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 30px; }
+.card { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #222; }
+.icon-theme { color: var(--theme); font-size: 20px; margin-bottom: 5px; display: block; }
+.card h3 { font-size: 12px; color: var(--theme); }
+.card p { font-size: 10px; color: #777; }
 
-function startTimer() {
-    let timeLeft = TIMER_START_SECONDS;
-    timerDisplay.textContent = formatTime(timeLeft);
+/* FILTROS */
+.filter-box { background: #0d0d0d; padding: 20px; border-radius: 20px; border: 1px solid #1a1a1a; margin-bottom: 30px; text-align: center; }
+.f-btn { background: #1a1a1a; border: 1px solid #333; color: white; padding: 8px 15px; border-radius: 20px; margin: 5px; }
+.f-btn.active { background: var(--theme); border-color: var(--theme); }
 
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        timerDisplay.textContent = formatTime(timeLeft);
+/* PRODUTOS */
+.products-row { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px; }
+.product-card-simple { background: #111; padding: 15px; border-radius: 15px; text-align: center; width: 45%; border: 2px solid #222; }
+.product-img-wrapper { width: 100%; aspect-ratio: 1/1; overflow: hidden; margin-bottom: 10px; }
+.product-img-wrapper img { width: 100%; height: 100%; object-fit: contain; }
 
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            timerDisplay.textContent = 'TEMPO ESGOTADO!';
-        }
-    }, 1000);
+.product-card-large { width: 100%; background: #111; border-radius: 20px; padding: 20px; text-align: center; border: 2px solid #9933ff; box-shadow: 0 0 10px #9933ff; }
+.large-img-wrapper { height: 120px; background: #000; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+
+/* PAGAMENTO ANIMADO */
+body.payment-active {
+    background: linear-gradient(-45deg, #0d001a, #200040, #001a1a, #1a0033);
+    background-size: 400% 400%;
+    animation: gradientBG 5s ease infinite;
 }
+@keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-// --- FUNÇÕES DE LÓGICA TELA 1 (Cupom e Preço) ---
+.payment-card-outer { padding: 4px; border-radius: 25px; background: #9933ff; margin-top: 20px; box-shadow: 0 0 30px #9933ff; }
+.payment-card { background: #0a0a0a; border-radius: 22px; padding: 20px; }
+.plan-box { background: #000; border: 2px solid var(--cyan-neon); box-shadow: inset 0 0 10px var(--cyan-neon); padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 
-function updatePriceDisplay() {
-    // Adiciona "R$" e formata para vírgula
-    priceIndicator.textContent = `Preço: R$${currentProductPrice.toFixed(2).replace('.', ',')}`;
+/* COMPRAR NEON VERDE */
+.buy-mini-box { 
+    color: var(--green-neon); border: 2px solid var(--green-neon); 
+    padding: 5px 10px; border-radius: 8px; font-weight: bold;
+    box-shadow: 0 0 10px var(--green-neon); animation: blink 1s infinite;
 }
+@keyframes blink { 50% { opacity: 0.5; } }
 
-applyCouponBtn.addEventListener('click', function() {
-    const input = couponInput.value.trim();
-    const messageElement = couponMessage;
-    
-    if (input.toUpperCase() === CORRECT_COUPON) { 
-        currentProductPrice = INITIAL_PRODUCT_PRICE * (1 - DISCOUNT_PERCENTAGE);
-        messageElement.textContent = `🎉 Cupom aceito! 30% de desconto aplicado. Preço: R$${currentProductPrice.toFixed(2).replace('.', ',')} 🎉`;
-        messageElement.className = 'coupon-message success';
-    } else {
-        currentProductPrice = INITIAL_PRODUCT_PRICE;
-        // Mensagem de erro corrigida e em minúsculas:
-        messageElement.textContent = 'cupom incorreto.'; 
-        messageElement.className = 'coupon-message incorrect'; 
-    }
-    updatePriceDisplay();
-});
-
-
-// --- FUNÇÕES DE CONTROLE DE MODAL (Atualizadas) ---
-
-function openModal(modal) {
-    modal.style.display = 'block';
-}
-
-function updateAttentionModalContent(productType) {
-    if (productType === 'VIP') {
-        proofTitleElement.textContent = VIP_PROOF_VIDEO_TITLE;
-        // Não usamos autoplay no modal de atenção
-        proofVideoIframe.src = `https://www.youtube.com/embed/${VIP_PROOF_VIDEO_ID}?autoplay=0&controls=1&modestbranding=1`; 
-    } else { // HS
-        proofTitleElement.textContent = HS_PROOF_VIDEO_TITLE;
-        proofVideoIframe.src = `https://www.youtube.com/embed/${HS_PROOF_VIDEO_ID}?autoplay=0&controls=1&modestbranding=1`;
-    }
-}
-
-function openAttentionModal(productType) {
-    activeProduct = productType;
-    updateAttentionModalContent(productType);
-    attentionModal.style.display = 'block';
-}
-
-function closeModal(modal) {
-    modal.style.display = 'none';
-}
-
-// Handler: Abre o Modal de Atenção (Produto 1 - HS PESCOÇO)
-startPurchaseBtn.addEventListener('click', () => {
-    openAttentionModal('HS');
-});
-
-// Handler: Abre o Modal de Atenção (Produto 2 - PAINEL VIP)
-if (startVipPurchaseBtn) { 
-    startVipPurchaseBtn.addEventListener('click', () => {
-        openAttentionModal('VIP');
-    });
-}
-
-// Handler: Fecha os Modals (Botão X)
-closeBtns.forEach(btn => btn.addEventListener('click', () => {
-    closeModal(attentionModal);
-    closeModal(durationModal);
-}));
-
-// Handler: Passa do Modal de Atenção para o Modal de Duração
-confirmModalBtn.addEventListener('click', () => {
-    closeModal(attentionModal);
-    openModal(durationModal);
-    // Limpa a entrada e mensagem de erro ao abrir
-    durationInput.value = '';
-    durationValidationMessage.textContent = '';
-    paymentStepContent.style.display = 'none';
-});
-
-// --- FUNÇÕES DE LÓGICA MODAL DURAÇÃO ---
-
-durationInput.addEventListener('input', function() {
-    // 1. Limitar a entrada a 2 dígitos (ou 1 se for o caso)
-    let value = this.value.replace(/\D/g, ''); // Remove não-dígitos
-    if (value.length > 2) {
-        value = value.slice(0, 2);
-    }
-    this.value = value;
-
-    daysSelected = parseInt(value);
-
-    // Esconde os detalhes do pagamento por padrão
-    paymentStepContent.style.display = 'none';
-    durationValidationMessage.textContent = '';
-    durationValidationMessage.className = 'validation-message';
-
-    if (isNaN(daysSelected) || daysSelected < 1) {
-        // Nada selecionado ou inválido, apenas retorna
-        return;
-    }
-
-    if (daysSelected > 30) {
-        durationValidationMessage.textContent = 'VOCÊ SÓ PODE ESCOLHER DE 1 A 30 DIAS';
-        durationValidationMessage.className = 'validation-message incorrect';
-        return;
-    }
-    
-    // 2. Cálculo do Preço
-    finalPaymentPrice = DAY_PRICES[daysSelected];
-    
-    if (finalPaymentPrice) {
-        const priceFormatted = finalPaymentPrice.toFixed(2).replace('.', ',');
-        finalPriceElement.textContent = `R$${priceFormatted}`;
-        durationValidationMessage.textContent = `✅ ${daysSelected} dias selecionados. Preço: R$${priceFormatted}`;
-        durationValidationMessage.className = 'validation-message success';
-        
-        // Exibe a seção de pagamento
-        paymentStepContent.style.display = 'block';
-        
-        // Reseta informações de pagamento
-        copyFeedback.textContent = '';
-        bankInfoDiv.style.display = 'none';
-        openInstagramBtn.style.display = 'none';
-        instagramInstructions.style.display = 'none';
-    }
-});
-
-// Forçar o teclado numérico em dispositivos móveis (já feito com inputmode="numeric" no HTML, mas reforçando)
-durationInput.addEventListener('focus', function() {
-    this.setAttribute('inputmode', 'numeric');
-});
-
-// --- FUNÇÕES DE LÓGICA PAGAMENTO ---
-
-// Handler: Copia a chave PIX
-copyPixBtn.addEventListener('click', function() {
-    if (finalPaymentPrice === 0) {
-        copyFeedback.textContent = 'Selecione a duração antes de copiar.';
-        copyFeedback.className = 'incorrect';
-        return;
-    }
-
-    const priceFormatted = finalPaymentPrice.toFixed(2).replace('.', ',');
-    
-    // Copia a chave Pix
-    navigator.clipboard.writeText(PIX_KEY)
-        .then(() => {
-            // Sucesso na cópia
-            copyFeedback.textContent = `✅ Chave PIX copiada com sucesso! Valor: R$${priceFormatted}`;
-            copyFeedback.className = 'success';
-            
-            // Mostra os detalhes do banco e o botão Instagram
-            bankInfoDiv.style.display = 'block';
-            openInstagramBtn.style.display = 'block';
-            instagramInstructions.style.display = 'block';
-        })
-        .catch(err => {
-            // Falha na cópia (fallback)
-            console.error('Falha ao copiar:', err);
-            copyFeedback.textContent = `Erro ao copiar (Copie manualmente): ${PIX_KEY}. Valor: R$${priceFormatted}`;
-            copyFeedback.className = 'incorrect';
-            bankInfoDiv.style.display = 'block'; // Mostra os dados mesmo com erro
-        });
-});
-
-// Handler: Abre o Instagram no Direct com a mensagem pronta
-openInstagramBtn.addEventListener('click', function() {
-    window.open(INSTAGRAM_LINK_DIRECT, '_blank');
-});
-
-// --- FUNÇÕES DE SCROLL (Para o Timer Fixo) ---
-
-function handleScroll() {
-    if (window.scrollY > 50) { // Se rolar mais de 50px
-        countdownTimer.classList.add('scrolled-timer');
-    } else {
-        countdownTimer.classList.remove('scrolled-timer');
-    }
-}
-
-
-// --- Inicialização ---
-
-window.addEventListener('scroll', handleScroll);
-startTimer(); 
-updatePriceDisplay(); // Inicializa o display de preço
-startSocialProofCycle(); // Inicia o ciclo de mensagens
+/* SIDEBAR */
+.sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background: #0e0e0e; z-index: 1002; transition: 0.4s; padding: 40px 20px; }
+.sidebar.active { left: 0; }
+.sub-menu { display: none; margin-top: 10px; background: #111; border-radius: 10px; }
+.sub-menu.active { display: block; }
+.section-title { color: var(--theme); text-align: center; margin: 25px 0 15px; font-size: 18px; }
+.step-num { background: var(--theme); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+.notification { position: fixed; bottom: 20px; left: 20px; background: #111; border-left: 5px solid var(--theme); padding: 15px; border-radius: 10px; z-index: 9999; }
